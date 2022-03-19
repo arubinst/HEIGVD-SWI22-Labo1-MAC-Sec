@@ -93,7 +93,7 @@ __Question__ : quel code est utilisé par aircrack pour déauthentifier un clien
 
 ![image-20220310161439054](figures/image-20220310161439054.png)
 
-On voit donc qu'il s'agit du code 7. Cela indique que le client a tenté de transférer des données avant leur association.
+On voit donc qu'il s'agit du code 7. Cela indique que le client a tenté de transférer des données avant son association.
 
 
 
@@ -116,13 +116,49 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
+Ce sont les codes 4 et 5 qui justifient l'envoi de la trame à la STA cible. En effet l'AP peut envoyer une trame de désauthentification avec le code 4 à la STA cible en raison de son inactivité sur le réseau. 
+
+Pour ce qui est du code 5, si l'AP n'est pas capable de traiter toutes les STAs actuellement associées, il peut envoyer ce code-là pour désauthentifier la STA cible.
+
+Cependant, le code 1 pourrait également être envoyé par l'AP à la STA cible étant donné que la raison n'est pas spécifiée. Pour des raisons de simplicité du script, le code 1 est toujours envoyé par la STA vers l'AP cible.
+
+
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
+
+C'est le code 8 qui justifie l'envoi de la trame à l'AP cible. En effet, c'est à la STA de dire à l'AP qu'elle quitte le BSS (Basic Service Set).
+
+Comme pour la question précédente, le code 1 pourrait être envoyé autant par la STA que par l'AP. Ici, nous avons défini que c'était la STA qui envoyait ce code à l'AP cible dans le script.
+
+
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
+Il suffit de mettre l'adresse MAC `FF:FF:FF:FF:FF:FF` comme adresse cible afin de désauthentifier toutes les STAs connectées à l'AP choisi. 
+
+Il a été intéressant de constater qu'en lançant le script avec cette adresse de broadcast comme adresse cible, cela ne fonctionne pas avec les Reason Codes 1 et 8. Dans ces deux cas, il faut renseigner l'adresse MAC d'une STA en particulier. Ce qui est assez logique pour le code 8 car il est censé venir d'une STA bien précise vers l'AP pour indiquer qu'elle quitte le BSS. Par contre pour ce qui est du code 1, cela est peut-être dû au fait qu'il n'est pas possible de déconnecter toutes les STAs en fournissant une raison non-spécifiée.
+
+
+
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
+Dans les deux cas, cela indique que la STA quitte le Service Set auquel elle était connectée. Mais la nuance est que le code 3 indique qu'elle a quitté le Service Set IBSS (Independant Basic Service Set) ou le Service Set ESS (Extended Service Set) alors que le code 8 indique qu'elle a quitté le Service Set BSS (Basic Service Set).
+
+Caractéristiques de ces 3 modes d'opération : 
+
+- **IBSS** : Réseau sans-fil n'utilisant pas de point d'accès et n’étant constitué que d’équipements clients qui communiquent entre eux sans aucune fonction de contrôle, de gestion de la sécurité ou de statistique centralisée. Réseau "ad-hoc" ou "peer-to-peer".
+- **ESS** : Réseau sans fil, créé par plusieurs points d'accès, qui apparaît aux utilisateurs comme un réseau unique et homogène, tel qu'un réseau couvrant une maison ou un bureau qui est trop grand pour être couvert de manière fiable par un seul point d'accès. Les points d'accès sont reliés entre eux par un DS (Distribution System).
+- **BSS** : Réseau sans-fil classique que l'on trouve dans la majorité des cas, identifié par un BSSID, formé par un AP et les stations situées dans sa zone de couverture.
+
+
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+
+La cible est directement déconnectée du réseau et perd donc l'accès à Internet tant que les trames de désauthentification lui sont envoyées. Elle tente donc de se connecter à un autre réseau pouvant lui fournir un accès.
+
+Il a été intéressant de voir que si l'on envoie suffisamment de trames de désauthentification à une STA cible, elle met un certain temps à se reconnecter au réseau, il a même été des fois nécessaire de la reconnecter manuellement après l'attaque.
+
+
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
