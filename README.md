@@ -91,7 +91,7 @@ a) Utiliser la fonction de déauthentification de la suite aircrack, capturer le
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
-![image-20220310161439054](C:\Users\Nicolas\Documents\HEIG-VD\Annee_3\Semestre_6\SWI\Laboratoires\HEIGVD-SWI22-Labo1-MAC-Sec\figures\image-20220310161439054.png)
+![image-20220310161439054](figures\image-20220310161439054.png)
 
 On voit donc qu'il s'agit du code 7. Cela indique que le client a tenté de transférer des données avant leur association.
 
@@ -101,7 +101,7 @@ __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres tra
 
 Oui nous en avons trouvé une autre avec un autre Reason Code :
 
-![image-20220310161834402](C:\Users\Nicolas\Documents\HEIG-VD\Annee_3\Semestre_6\SWI\Laboratoires\HEIGVD-SWI22-Labo1-MAC-Sec\figures\image-20220310161834402.png)
+![image-20220310161834402](figures\image-20220310161834402.png)
 
 Ici, il s'agit du code 2. Cela indique que le client s'est associé mais n'est pas autorisé.
 
