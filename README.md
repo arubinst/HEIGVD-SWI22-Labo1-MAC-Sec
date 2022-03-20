@@ -170,6 +170,10 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
+On annonce avec ces beacons que le réseau est disponible sur un autre canal, la cible peut alors s'y connecter. Elle n'aura cependant pas de connexion sur ce canal car il n'y pas de réseau sur cette fréquence. On pourrait disposer d'un AP malicieux sur ce canal afin de récupérer les informations de la cible qui transitent. Combinée à l'attaque par désauthentification du point précédent, on pourrait dans un premier temps déconnecter la cible puis dans un deuxième envoyer des beacons forgés afin qu'elle se connecte sur notre réseau malicieux.
+
+
+
 
 ### 3. SSID flood attack
 
