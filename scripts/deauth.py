@@ -12,8 +12,6 @@ def deauth(target_mac, gateway_mac, inter=0.1, count=None, loop=1, iface="wlp1s0
                        "5 - Disassociated because AP is unable to handle all currently associated stations \n"
                        "8 - Deauthenticated because sending STA is leaving BSS \n"
                        "Reason code : "))
-
-service network-manager start
     
     # addr1: destination MAC
     # addr2: source MAC
