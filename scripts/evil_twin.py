@@ -28,7 +28,7 @@ def callback(packet):
         channel = stats.get("channel")
         networks.loc[bssid] = (ssid, dbm_signal, channel)
 
-
+# prints all available ssid in the network, list updated every 0.5s
 def print_all(stop_signal):
     while True:
         os.system("clear")
@@ -37,7 +37,7 @@ def print_all(stop_signal):
         if stop_signal():
             break
 
-
+# change channel every 0.5s
 def change_channel(stop_signal):
     ch = 1
     while True:
@@ -50,7 +50,7 @@ def change_channel(stop_signal):
 
 
 if __name__ == "__main__":
-    # interface name, check using iwconfig
+    # interface name
     interface = "wlp1s0mon"
     stop_thread = False
     # start the thread that prints all the networks
@@ -83,6 +83,8 @@ if __name__ == "__main__":
     
     # prepare packet with all parameters
     packet = RadioTap()/dot11/beacon/essid/channel_packet
+    
+    print("Press Ctrl+C if you want to stop sending packets")
     
     # send packet
     sendp(packet, iface=interface, inter=0.100, loop=1)
