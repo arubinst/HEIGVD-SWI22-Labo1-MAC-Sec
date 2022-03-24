@@ -211,7 +211,15 @@ Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twi
 
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 
+Cela rendrait plus complexe la recherche de réseaux car cela impliquerait une gestion de clé pour que l'AP ciblé déchiffre la Probe Request avant même que la STA soit authentifiée auprès de lui. De plus, la randomisation des adresses MAC limite déjà correctement l'impact de cette attaque et les STAs envoient moins de Probe Requests qu'à l'époque.
+
+
+
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
+
+Car ils sont capables de randomiser leur adresse MAC et ne peuvent donc plus être identifiés lorsqu'ils envoient une Probe Request afin de trouver un réseau.
+
+
 
 
 ### 5. Détection de clients et réseaux
