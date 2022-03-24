@@ -20,9 +20,12 @@ def phandle(p):
                  
                             
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Script that lists all STAs that are looking for a given SSID') 
+    
+    # add all arguments to parser
+    parser = argparse.ArgumentParser(description='A python script that lists all STAs that are looking for a given SSID') 
     parser.add_argument('interface', action="store", help="Specify a monitoring interface (ex. mon0)", default=False) 
     parser.add_argument("ssid", action="store", help="Specify a ssid that you are looking for (ex. McDonald's)") 
     args = parser.parse_args() 
     ssid_wanted = args.ssid 
+    
     sniff(iface=args.interface,prn=phandle, store=0) 
