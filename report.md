@@ -59,3 +59,18 @@ Code 3 est pour IBSS et ESS
 La cible se retrouve déconnectée du réseau sans fil
 ```
 
+
+
+## Probe Request Evil Twin Attack
+
+**Question** : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
+
+```
+Ces trames doivent pouvoir être accessible par tout le monde puisque c'est le système utilisé pour détecter les Wi-Fi aux alentours.
+```
+
+**Question** : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
+
+```
+Parce que le MAC est désormais randomisé à chaque connection
+```
