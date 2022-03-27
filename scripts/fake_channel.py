@@ -53,7 +53,7 @@ def change_channel(stop_signal):
 if __name__ == "__main__":
     
     # add all arguments to parser
-    parser = argparse.ArgumentParser(description="A python script for create fake channel")
+    parser = argparse.ArgumentParser(description="A python script to create a fake channel")
     parser.add_argument('interface', action="store", help="Specify a monitoring interface (ex. mon0)", default=False) 
     args = parser.parse_args()
     interface = args.interface
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     channel_changer.daemon = True
     channel_changer.start()
     # start sniffing
-    sniff(prn=callback, iface=interface, timeout=5)
+    sniff(prn=callback, iface=interface, timeout=10)
     
     # stop threads for sniffing network
     stop_thread = True
