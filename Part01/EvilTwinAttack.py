@@ -1,10 +1,4 @@
 from scapy.all import *
-
-import pandas
-import time
-import os
-
-# initialize the networks dataframe that will contain all access points nearby
 from scapy.layers.dot11 import Dot11Beacon, Dot11, Dot11Elt, RadioTap
 
 ap_list = {}
