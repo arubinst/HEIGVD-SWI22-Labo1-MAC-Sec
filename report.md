@@ -155,8 +155,10 @@ a) Développer un script en Python/Scapy capable de lister toutes les STA qui ch
 
 **Fonctionnement**
 
-Nous avons ajouté l'interface ainsi que ssid à chercher en arguments du script:
+Nous avons ajouté l'interface ainsi que le ssid à chercher en arguments du script:
 
 ![](images/4_0.png)
+
+Ainsi, nous avons lancé le script en cherchant le ssid `HEIG-VD`:
 
 ![](images/4_1.png)
