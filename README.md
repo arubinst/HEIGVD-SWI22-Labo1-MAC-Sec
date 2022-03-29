@@ -298,9 +298,15 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 
 00:0E:35:C8:B8:66 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 
+Le script affiche les BSSIDs et SSIDs des APs détectés aux alentours ainsi que les STAs associées à ceux-ci :
 
+![image-20220329222059612](figures/image-20220329222059612.png)
 
+Exemple d'utilisation :
 
+```bash
+sudo python3 detecting_associated_sta.py
+```
 
 
 
