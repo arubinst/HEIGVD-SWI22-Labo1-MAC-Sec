@@ -6,11 +6,11 @@ from scapy.all import *
 from scapy.layers.dot11 import Dot11ProbeReq, Dot11Beacon, Dot11, Dot11Elt, RadioTap
 
 parser = argparse.ArgumentParser(prog="Scapy Fake channel Evil Tween attack",
-                                 usage="evil_twin_probe_request.py -i wlp2s0mon",
+                                 usage="evil_twin_probe_request.py -i wlp2s0mon -b 00:11:22:33:44:55",
                                  allow_abbrev=False)
 
 parser.add_argument("-i", "--Interface", required=True,
-                    help="The interface that you want to send packets out of, needs to be set to monitor mode")
+                    help="The interface that you want to use, needs to be set to monitor mode")
 parser.add_argument("-b", "--BSSID", required=False,
                     help="The BSSID of the AP for the new network (Will default to interface's mac if not specified)",
                     default="")
@@ -49,12 +49,10 @@ def detect_probe_request():
     """
     print("List of SSID requested :")
 
-    # Use a separate thread to sniff, so we can stop it later and can run the detection section forever
     e = threading.Event()
     t = threading.Thread(target=sniff_, args=(e,))
     t.start()
 
-    # Infinite loop, until the user keyboard interrupts the script with CTRL+C
     try:
         while True:
             time.sleep(1)
@@ -62,7 +60,7 @@ def detect_probe_request():
         e.set()
 
         while t.is_alive():
-            t.join(2)
+            t.join(1)
 
 
 def select_ssid():
