@@ -319,6 +319,12 @@ __Question__ : expliquer en quelques mots la solution que vous avez trouvée pou
 
 Un réseau masqué remplace les caractères de son SSID dans les beacons par des bytes \x00. Nous avons donc commencé par capturer les beacons des réseaux masqués. Puis, pour trouver leurs vrais SSIDs, nous avons sniffer le réseau jusqu'à capturer des Probe Requests envoyés par ces mêmes réseaux masqués contenant leurs SSIDs réels.
 
+Le script commence par détecter tous les beacons dont leurs SSIDs sont "vides" puis essaie de capturer des éventuelles Probe Responses venant des réseaux masqués afin d'obtenir leurs SSIDs réels :
+
+![image-20220329233335736](figures/image-20220329233335736.png)
+
+Ici l'option `-s` permet de renseigner une durée (en secondes) pendant lequel le script va sniffer le réseau.
+
 
 
 ## Livrables
