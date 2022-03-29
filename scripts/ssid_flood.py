@@ -29,6 +29,7 @@ def generate_beacon_frame():
 
     beacon = Dot11Beacon(cap='ESS+privacy')
 
+    # Forcing a channel as it does not matter here
     channel = Dot11Elt(ID='DSset', info=chr(11))
 
     rsn = Dot11Elt(ID='RSNinfo', info=(

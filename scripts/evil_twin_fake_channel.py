@@ -44,10 +44,10 @@ def DisplayInfoAP(bssid):
     p = BSSIDPackets[bssid]
     print("{:03d}) {} {} {:d} {:-32}".format(
         BSSIDs.index(bssid), p.addr3, p.dBm_AntSignal, int(ord(p[Dot11Elt:3].info)), p.info.decode("utf-8")))
-    print("Press CTRL+C to stop scanning, and select target", end="\r")
+    print("To stop scanning and select your target, press CTRL+C.", end="\r")
 
 
-def _sniff(e):
+def sniff_(e):
     sniff(iface=args.Interface, prn=packetHandler, stop_filter=lambda p: e.is_set())
 
 
@@ -60,7 +60,7 @@ def detectAP():
 
     # Spawn a thread for detecting networks
     e = threading.Event()
-    t = threading.Thread(target=_sniff, args=(e,))
+    t = threading.Thread(target=sniff_, args=(e,))
     t.start()
 
     # Wait for interruption to stop thread
