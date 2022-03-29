@@ -82,7 +82,7 @@ if __name__ == "__main__":
     printer.daemon = True
     printer.start()
 
-    # start the channel changer
+    # start the channel changer to accelerate sniffing
     channel_changer = Thread(target=change_channel, args=(lambda: stop_threads,))
     channel_changer.daemon = True
     channel_changer.start()

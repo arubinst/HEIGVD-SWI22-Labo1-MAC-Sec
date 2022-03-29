@@ -98,12 +98,18 @@ if __name__ == '__main__':
     printer.daemon = True
     printer.start()
 
+    # start the channel changer
+    channel_changer = Thread(target=change_channel, args=(lambda: stop_threads,))
+    channel_changer.daemon = True
+    channel_changer.start()
+
     # start sniffing
     sniff(prn=callback, iface=interface, timeout=sniff_time)
 
     # stop thread used for printing found SSID and detected networks
     stop_threads = True
     printer.join()
+    channel_changer.join()
 
     if probes.empty or networks.empty:
         print("No probe requests or networks detected")
