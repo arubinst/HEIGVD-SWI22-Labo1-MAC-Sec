@@ -96,8 +96,6 @@ Code : **7**
 
 Interprétation :  **La station a essayé de transférer des données avant d'être associée.**
 
-
-
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. 
 
 Avez-vous en trouvé d'autres ? 
@@ -116,8 +114,6 @@ Code : **15**
 
 Interprétation : 4-way handshake timeout
 
-
-
 b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
 
 * 1 - Unspecified
@@ -131,32 +127,22 @@ Le code 1 : erreur non spécifiée, donc peut être reçu par la STA
 Le code 4: indique que le délai d'expiration de la session client a expiré, donc reçu par la STA.
 Le code 5: indique au client que l'AP est occupé, donc reçu par la STA.
 
-
-
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
 
 Le code 1 : erreur non spécifiée, donc peut être reçu par l'AP
 Le code 8 : l'AP est informée que le client s'est/a été déconnecté
 
-
-
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
 Il faut utiliser l'addresse de broadcast. 
-
-
 
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
 Le code 3 indique que la station a quitté un réseau de type ad-hoc ou ESS, alors que le code 8 que la station a quitté un réseau de type BSS classique.
 
-
-
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
 Elle se fait déconnecter du réseau, mais les équipements réseau ont tendance à se reconnecter automatiquement rendant son effet temporaire. 
-
-
 
 ### 2. Fake channel evil tween attack
 
@@ -169,13 +155,21 @@ a)    Développer un script en Python/Scapy avec les fonctionnalités suivantes 
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
+L'attaque permet de forger un Beacon frame sur un channel différent, le Beacon frame possède le SSID d'une AP existante et le BSSID de l'attaquant. L'utilisateur ne peut pas différencier la légitimité de ces réseaux et risque donc de se connecter sur l'evil twin. Surtout si il se fait déauthentifier de l'autre réseau. 
+
+
+
+**Execution du script + wireshark :**
+
+![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-17-16-33-image.png)
+
+On remarque que les nouvelles frames forgées proviennent bien du BSSID evil (00:c0:ca:3f:b7:4a) avec le même SSID de l'AP choisi (Centre-de-Podologie)
+
 
 
 ### 3. SSID flood attack
 
 Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.
-
-
 
 ## Partie 2 - probes
 
