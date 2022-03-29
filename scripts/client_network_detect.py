@@ -19,7 +19,7 @@ args = parser.parse_args()
 BSSID_to_SSID = {}
 
 
-def packetHandler(p):
+def packet_handler(p):
     if p.FCfield & 0x1 != 0 or p.FCfield & 0x2 != 0:
         return
 
@@ -33,31 +33,13 @@ def packetHandler(p):
 
     if args.SSID is None or args.SSID == p.info.decode('utf-8'):
         if p.addr3 == p.addr2:
-            DisplayFunc(str(p.addr1), str(p.addr3))
+            display_info(str(p.addr1), str(p.addr3))
         else:
-            DisplayFunc(str(p.addr2), str(p.addr3))
+            display_info(str(p.addr2), str(p.addr3))
 
 
-def DisplayFunc(sta, bssid):
+def display_info(sta, bssid):
     print("{}    {}".format(sta, bssid))
 
 
-def sniff_(e):
-    a = sniff(iface=args.Interface, prn=packetHandler, stop_filter=lambda p: e.is_set())
-
-
-def detect_client_network():
-    print("STAs                 APs      ")
-
-    e = threading.Event()
-    t = threading.Thread(target=sniff_, args=(e,))
-    t.start()
-
-    try:
-        while True:
-            time.sleep(1)
-    except (KeyboardInterrupt, SystemExit):
-        e.set()
-
-        while t.is_alive():
-            t.join(1)
+sniff(iface=args.Interface, prn=packet_handler)

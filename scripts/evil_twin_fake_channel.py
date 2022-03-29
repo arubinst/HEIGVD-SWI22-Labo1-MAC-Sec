@@ -24,8 +24,7 @@ BSSIDs = []
 BSSIDPackets = {}
 
 
-# We sniff all Dot11 beacon packets, and store 1 packet per AP bssid
-def packetHandler(p):
+def packet_handler(p):
     """
     Packet handler to analyse packet and discover new AP on the network
     :param p: the packet to analyse
@@ -33,10 +32,10 @@ def packetHandler(p):
     if p.haslayer(Dot11Beacon) and p.addr3 not in BSSIDs:
         BSSIDs.append(str(p.addr3))
         BSSIDPackets[str(p.addr3)] = p
-        DisplayInfoAP(str(p.addr3))
+        display_info_AP(str(p.addr3))
 
 
-def DisplayInfoAP(bssid):
+def display_info_AP(bssid):
     """
     Display information about the AP
     :param bssid: the BSSID of the AP to display
@@ -48,10 +47,10 @@ def DisplayInfoAP(bssid):
 
 
 def sniff_(e):
-    sniff(iface=args.Interface, prn=packetHandler, stop_filter=lambda p: e.is_set())
+    sniff(iface=args.Interface, prn=packet_handler, stop_filter=lambda p: e.is_set())
 
 
-def detectAP():
+def detect_AP():
     """
     Detect AP based on beacon emission and display a list of detected networks
     The value displayed are the value at the first detection and are not updated
@@ -133,7 +132,7 @@ def fake_channel(target_packet):
     sendp(frame, iface="wlan0mon", inter=0.100, loop=1)
 
 
-detectAP()
+detect_AP()
 selected_id = select_bssid()
 if selected_id == -1:
     print("No AP detected. Exiting...")

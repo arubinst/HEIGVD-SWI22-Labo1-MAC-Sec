@@ -20,17 +20,17 @@ args = parser.parse_args()
 SSIDs = []
 
 
-def packetHandler(p):
+def packet_handler(p):
     """
         Packet handler to analyse packet and store active detection packets
         :param p: the packet to analyse
         """
     if p.haslayer(Dot11ProbeReq) and p.info.decode("utf-8") not in SSIDs:
         SSIDs.append(p.info.decode("utf-8"))
-        displaySSID(p.info.decode("utf-8"))
+        display_SSID(p.info.decode("utf-8"))
 
 
-def displaySSID(ssid):
+def display_SSID(ssid):
     """
     Display information about the ssid detected in the probe request
     :param ssid: the ssid found
@@ -40,7 +40,7 @@ def displaySSID(ssid):
 
 
 def sniff_(e):
-    sniff(iface=args.Interface, prn=packetHandler, stop_filter=lambda p: e.is_set())
+    sniff(iface=args.Interface, prn=packet_handler, stop_filter=lambda p: e.is_set())
 
 
 def detect_probe_request():
