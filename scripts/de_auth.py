@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser(prog="Scapy de-authentication attack",
                                  allow_abbrev=False)
 
 parser.add_argument("-i", "--Interface", required=True,
-                    help="The interface that you want to send packets out of, needs to be set to monitor mode")
+                    help="The interface that you want to use, needs to be set to monitor mode")
 parser.add_argument("-b", "--BSSID", required=True, help="The BSSID of the AP you want to target")
 parser.add_argument("-c", "--Client", required=True,
                     help="The MAC address of the STA you want to deauth from the AP. For broadcast use FF:FF:FF:FF:FF:FF ")

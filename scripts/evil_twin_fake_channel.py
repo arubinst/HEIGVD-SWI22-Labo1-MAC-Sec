@@ -12,9 +12,9 @@ parser = argparse.ArgumentParser(prog="Scapy Fake channel Evil Tween attack",
                                  allow_abbrev=False)
 
 parser.add_argument("-i", "--Interface", required=True,
-                    help="The interface that you want to send packets out of, needs to be set to monitor mode")
+                    help="The interface that you want to use, needs to be set to monitor mode")
 parser.add_argument("-b", "--BSSID", required=False,
-                    help="The BSSID of the AP you want people to connect to (Will default to interface's mac if not specified)",
+                    help="The BSSID of the AP for the new network (Will default to interface's mac if not specified)",
                     default="")
 
 args = parser.parse_args()
