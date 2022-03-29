@@ -106,7 +106,7 @@ Si oui, quel code contient-elle et quelle est son interpretation ?
 
 Code : **3**
 
-Interprétation : L'AP s'est déconnecté
+Interprétation : La station s'est déconnectée
 
 ---
 
@@ -157,19 +157,25 @@ __Question__ : Expliquer l'effet de cette attaque sur la cible
 
 L'attaque permet de forger un Beacon frame sur un channel différent, le Beacon frame possède le SSID d'une AP existante et le BSSID de l'attaquant. L'utilisateur ne peut pas différencier la légitimité de ces réseaux et risque donc de se connecter sur l'evil twin. Surtout si il se fait déauthentifier de l'autre réseau. 
 
-
-
 **Execution du script + wireshark :**
 
 ![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-17-16-33-image.png)
 
 On remarque que les nouvelles frames forgées proviennent bien du BSSID evil (00:c0:ca:3f:b7:4a) avec le même SSID de l'AP choisi (Centre-de-Podologie)
 
-
-
 ### 3. SSID flood attack
 
 Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.
+
+**Avec 3 SSIDS générés aléatoirement :**
+
+![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-17-50-02-image.png)
+
+**Avec un fichier.txt contenant 3 SSIDs :**
+
+![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-17-54-46-image.png)
+
+## 
 
 ## Partie 2 - probes
 

@@ -93,7 +93,7 @@ def evil_twin_fake_channel():
 
 # Args parsing
 parser = argparse.ArgumentParser(prog="Scapy Fake channel Evil Tween attack",
-                                 usage="evil_twin_fake_channel.py -i wlp2s0mon -b 00:11:22:33:44:55 ",
+                                 usage="evil_twin_fake_channel.py -i wlp2s0mon -b 00:11:22:33:44:55 [-t 5 -n 10]",
                                  allow_abbrev=False)
 
 parser.add_argument("-i", "--Interface", required=True,
