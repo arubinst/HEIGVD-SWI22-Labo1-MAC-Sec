@@ -30,7 +30,6 @@ def packetHandler(p):
         displaySSID(p.info.decode("utf-8"))
 
 
-# Diplay function, run every time a new AP is found
 def displaySSID(ssid):
     """
     Display information about the ssid detected in the probe request
