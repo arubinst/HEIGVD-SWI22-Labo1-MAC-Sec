@@ -210,6 +210,18 @@ __Question__ : comment ça se fait que ces trames puissent être lues par tout l
 
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
 
+
+
+**Execution du script + Wireshark :**
+
+![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-19-00-43-image.png)
+
+On remarque qu'un SSID n'a pas tout de suite été trouvé, celà est du au fait qu'il n'y avait pas d'actives probe requests à proximité. Finalement, nous avons pu forger des beacons frames sur l'SSID entré par l'utilisateur (Salt_2GHz_0ED413_5GHz).
+
+
+
+
+
 ### 5. Détection de clients et réseaux
 
 a) Développer un script en Python/Scapy capable de lister toutes les STA qui cherchent activement un SSID donné
