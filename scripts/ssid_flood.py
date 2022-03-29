@@ -16,6 +16,7 @@ parser.add_argument("-c", "--count", required=False, help="Number of beacons to 
 
 args = parser.parse_args()
 
+
 def generate_beacon_frame():
     """
     Generate a beacon trame (like in the fake channel)
