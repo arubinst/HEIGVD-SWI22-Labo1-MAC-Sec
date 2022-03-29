@@ -92,6 +92,10 @@ def select_bssid():
 
 
 def fake_channel(target_packet):
+    """
+    Generate a fake clone network on a different channel based on a beacon trame of another network
+    :param target_packet: the packet containing the beacon trame of the network to spoof
+    """
     interface = netifaces.ifaddresses(args.Interface)[netifaces.AF_LINK]
 
     # Set given BSSID or use default
