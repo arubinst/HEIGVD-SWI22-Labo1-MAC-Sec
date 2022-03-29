@@ -160,6 +160,12 @@ Il a été intéressant de voir que si l'on envoie suffisamment de trames de dé
 
 
 
+Le script demande d'entrer l'adresse MAC cible, le BSSID de l'AP auquel la cible est connectée (ici on souhaite déconnecter tout le monde du réseau) puis d'entrer un Reason Code et envoie finalement les trames de désauthentification : 
+
+![image-20220329180055800](figures/image-20220329180055800.png)
+
+
+
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 
@@ -174,10 +180,42 @@ On annonce avec ces beacons que le réseau est disponible sur un autre canal, la
 
 
 
+Le script demande d'entrer le BSSID du réseau de l'evil twin, affiche les différents réseaux détectés en fonction des beacons capturés puis propose de se faire passer pour un de ces réseaux en entrant son BSSID. Finalement il envoie des beacons avec le SSID du réseau usurpé sur un canal situé à 6 canaux d'écart du vrai réseau  :
+
+![image-20220329182343676](C:\Users\Nicolas\Documents\HEIG-VD\Annee_3\Semestre_6\SWI\Laboratoires\HEIGVD-SWI22-Labo1-MAC-Sec\figures\image-20220329182343676.png)
+
+Exemple d'utilisation du script : 
+
+```bash
+sudo python3 evil_twin.py 38:00:25:8E:A4:E5
+```
+
+
+
 
 ### 3. SSID flood attack
 
 Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.
+
+Ici le script génère les beacons de 4 SSIDs aléatoires possédant tous une adresse MAC aléatoire :
+
+![image-20220329200437451](figures/image-20220329200437451.png)
+
+On les voit ensuite apparaître dans une capture Wireshark :
+
+![image-20220329200600581](figures/image-20220329200600581.png)
+
+
+
+Par contre ici, le script génère les beacons de 4 SSIDs contenus dans le fichier `ssid_list.txt`  avec également des adresses MAC aléatoires :
+
+![image-20220329201012337](figures/image-20220329201012337.png)
+
+Même chose ici, on peut les voir apparaître dans une capture Wireshark :
+
+![image-20220329201238803](figures/image-20220329201238803.png)
+
+
 
 
 ## Partie 2 - probes
@@ -242,6 +280,8 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 Développer un script en Python/Scapy capable de reveler le SSID correspondant à un réseau configuré comme étant "invisible".
 
 __Question__ : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
+
+Un réseau masqué remplace les caractères de son SSID dans les beacons par des bytes \x00. Nous avons donc commencé par capturer les beacons des réseaux masqués. Puis, pour trouver leurs vrais SSIDs, nous avons sniffer le réseau jusqu'à capturer des Probe Requests envoyés par ces mêmes réseaux masqués contenant leurs SSIDs réels.
 
 
 

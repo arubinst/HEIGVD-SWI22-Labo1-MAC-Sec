@@ -5,9 +5,9 @@ from faker import Faker
 from scapy.layers.dot11 import Dot11, Dot11Beacon, Dot11Elt, RadioTap
 
 
-# source code : https://www.thepythoncode.com/code/create-fake-access-points-scapy
+# inspired by : https://www.thepythoncode.com/code/create-fake-access-points-scapy
 
-def send_beacon(ssid, mac, count, interval):
+def send_beacon(ssid, bssid, count, interval):
     # type=0:       management frame
     # subtype=8:    beacon frame
     # addr1:        MAC address of the receiver
@@ -15,20 +15,22 @@ def send_beacon(ssid, mac, count, interval):
     # addr3:        MAC address of the Access Point (AP)
 
     # stack all the layers
-    frame = RadioTap() / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=mac, addr3=mac) / Dot11Beacon() / \
-            Dot11Elt(ID="SSID", info=ssid, len=len(ssid))
+    packet = RadioTap() \
+            / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=bssid, addr3=bssid) \
+            / Dot11Beacon(cap="ESS+privacy") \
+            / Dot11Elt(ID="SSID", info=ssid, len=len(ssid))
 
+    # if count is 0, it means we loop forever (until interrupt)
     if count == 0:
-        # if count is 0, it means we loop forever (until interrupt)
         loop = 1
         count = None
-        print(f"\n[+] Sending beacons of network {ssid} every {interval}s forever...")
+        print(f"\n[+] Sending beacons of network {ssid}({bssid}) every {interval}s forever...")
     else:
         loop = 0
-        print(f"\n[+] Sending {count} beacons of network {ssid} every {interval}s...")
+        print(f"\n[+] Sending {count} beacons of network {ssid}({bssid}) every {interval}s...")
 
-    # send the frame
-    sendp(frame, inter=interval, count=count, loop=loop, iface=interface, verbose=1)
+    # sending beacons
+    sendp(packet, inter=interval, count=count, loop=loop, iface=interface, verbose=1)
 
 
 if __name__ == '__main__':
@@ -40,13 +42,13 @@ if __name__ == '__main__':
 
     # user has to choose between using a SSID list in a file or generate n random SSID and cannot use both
     # (mutually exclusive group of arguments)
-    action.add_argument("-f", "--ssid-file", dest="ap_list", help="File containing a list of SSID to create", )
+    action.add_argument("-f", "--ssid-file", dest="ap_list", help="File containing a list of SSID to create")
     action.add_argument("-n", "--ssid-number", dest="n_ap", help="Number of random SSID to create")
 
     parser.add_argument("-c", "--count", help="Number of beacons to send per SSID, specify 0 to keep sending "
                                               "infinitely, default is 0", default=0)
     parser.add_argument("--interval",
-                        help="The sending frequency (in seconds) between two frames sent, default is 0.1s",
+                        help="The sending frequency (in seconds) between two sent frames, default is 0.1s",
                         default=0.1)
     args = parser.parse_args()
 
@@ -71,5 +73,5 @@ if __name__ == '__main__':
         with open(args.ap_list) as ap_list_file:
             for line in ap_list_file:
                 i += 1
-                # a thread is created for each read line
+                # a thread is created for each line read
                 Thread(target=send_beacon, args=(line.strip(), faker.mac_address(), count, interval)).start()
