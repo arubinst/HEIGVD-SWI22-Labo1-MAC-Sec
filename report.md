@@ -74,3 +74,4 @@ Ces trames doivent pouvoir être accessible par tout le monde puisque c'est le s
 ```
 Parce que le MAC est désormais randomisé à chaque connection
 ```
+
