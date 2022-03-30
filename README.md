@@ -208,9 +208,11 @@ Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twi
 
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 
+Si les paramètres de chiffrements ont changé dans le réseau (la clé notamment), il ne sera pas possible à l'AP de répondre à une probe request chiffrée. 
+
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
 
-
+Les addresses MAC sont générées aléatoirement ce qui rend l'appareil mobile difficile à tracer. Cependant cette méthode n'est souvent pas suffisante et peut être contournée ([Probe Request Based Device Identification Attack and Defense - PMC](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7472341/)).
 
 **Execution du script + Wireshark :**
 
@@ -218,13 +220,11 @@ __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils p
 
 On remarque qu'un SSID n'a pas tout de suite été trouvé, celà est du au fait qu'il n'y avait pas d'actives probe requests à proximité. Finalement, nous avons pu forger des beacons frames sur l'SSID entré par l'utilisateur (Salt_2GHz_0ED413_5GHz).
 
-
-
-
-
 ### 5. Détection de clients et réseaux
 
 a) Développer un script en Python/Scapy capable de lister toutes les STA qui cherchent activement un SSID donné
+
+![loading-ag-1100](images/2022-03-30-17-07-21-image.png)
 
 b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
 
