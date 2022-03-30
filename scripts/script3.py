@@ -18,12 +18,28 @@ from scapy.all import Dot11, Dot11Beacon, Dot11Elt, RadioTap, sendp, hexdump, Ra
 import sys
 import random
 import os
+from random import seed
+from random import random
+seed(1)
 
 
 def main():
-    ssids = sys.argv[2:]  # Network name here
-    iface = sys.argv[1]  # Interface name here
+    ssids = []
+    iface = "wlan0"
     frames = []
+    filename = input("Entrez le chemin absolu du fichier contenant les noms de SSID ou n'entrez rien pour créer des noms aléatoires\n")
+
+    if filename == "" :
+        nbNoms = int(input("Entrez le nombre de faux SSID à créer\n"))
+        for x in range(nbNoms) :
+            ssids.append(str(random()))
+    else:
+        file = open(filename, 'r')
+        while True:
+            line = file.readline()
+            if line == '': break
+            ssids.append(line)
+
     for netSSID in ssids:
         print
         netSSID
