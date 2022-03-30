@@ -5,6 +5,7 @@ from threading import Thread
 import pandas
 import time
 import os
+import argparse
 from uuid import getnode as get_mac
 myMac = ':'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
 
@@ -61,9 +62,20 @@ def fakeAccessPoint():
     sendp(frame, inter=0.1, iface=interface, loop=1, verbose=0)
 
 if __name__ == "__main__":
+    # check admin privileges
+    if not os.getuid() == 0:
+        print("Permission denied. Try running this script with sudo.")
+        exit()    
+    
+    parser = argparse.ArgumentParser(
+        description="Fake Channel Request Evil Twin Attack",
+        epilog="This script was developped as an exercise for the SWI course at HEIG-VD")
+        
+    parser.add_argument("interface", help="Interface to use")
+    args = parser.parse_args()
 
     # interface name, check using iwconfig
-    interface = "wlp0s20f3mon"
+    interface = args.interface
 
     # start the channel changer
     endChange = 0

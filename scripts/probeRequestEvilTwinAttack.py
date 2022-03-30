@@ -3,6 +3,7 @@ import pandas
 import time
 from threading import Thread
 from uuid import getnode as get_mac
+import argparse
 myMac = ':'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
 
 # Devices which are known to be constantly probing
@@ -74,8 +75,20 @@ def print_all():
     print(networks.iloc[:, 0:1])
 
 if __name__ == '__main__':
-    # SET VAR
-    interface = "wlp0s20f3mon"
+    # check admin privileges
+    if not os.getuid() == 0:
+        print("Permission denied. Try running this script with sudo.")
+        exit()    
+    
+    parser = argparse.ArgumentParser(
+        description="Probe Request Evil Twin Attack",
+        epilog="This script was developped as an exercise for the SWI course at HEIG-VD")
+        
+    parser.add_argument("interface", help="Interface to use")
+    args = parser.parse_args()
+
+    # interface name, check using iwconfig
+    interface = args.interface
     endChange = 0
 
     # Welcome
