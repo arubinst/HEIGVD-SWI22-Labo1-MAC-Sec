@@ -137,6 +137,10 @@ Avec la capture ci-dessous, nous pouvons voir les 3 différents AP avec des adre
 
 ## Probe Request Evil Twin Attack
 
+**Fonctionnement** : 
+
+
+
 **Question** : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 
 ```
@@ -163,3 +167,18 @@ Ainsi, nous avons lancé le script en cherchant le ssid `HEIG-VD`:
 
 ![](images/4_1.png)
 
+
+
+b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
+
+**Fonctionnement** :
+
+Voici comment lancer le script : 
+
+![](\images\5_5.PNG)
+
+![](\images\5_4.PNG)
+
+On confirme le résultat en faisant un airodump sur la même interface afin de vérifier le BSSID correspondant à une des STA : 
+
+![](\images\5_6.PNG)
