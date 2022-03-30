@@ -1,16 +1,22 @@
 #!/usr/bin/python3
 from scapy.all import *
-import argparse
 from threading import Thread
+import argparse
+import pandas
+from time import sleep
 import os
 
-def callback(packet):
-    if packet.haslayer(Dot11ProbeReq) and packet.info.decode("utf-8") == ssid:
-        addr = packet.addr2
-        if not addr in sta:
-            sta.add(addr)
-            print("\t", addr)
+hashs = set()
 
+def callback(packet):
+    if packet.haslayer(Dot11ProbeReq):
+            ssid = packet.info.decode('utf-8')
+            sta = packet.addr2
+            h = ssid + sta
+            if h not in hashs:
+                hashs.add(h)
+                print(f"{packet.addr2}    {ssid.ljust(25)}    {packet.dBm_AntSignal}")
+            
 def change_channel():
     ch = 1
     while not stop_signal:
@@ -23,35 +29,33 @@ def sniff_sta():
     sniff(prn=callback, iface=interface, stop_filter=lambda _:stop_signal)    
     print("Stopped sniffing")
 
-
 if __name__ == "__main__":
+
     # check admin privileges
     if not os.getuid() == 0:
         print("Permission denied. Try running this script with sudo.")
         exit()
 
     parser = argparse.ArgumentParser(
-        description="Listens for every STA looking up for the given SSID",
+        description="Listens for every STA sending probe requests",
         epilog="This script was developped as an exercise for the SWI course at HEIG-VD")
         
-    parser.add_argument("ssid")
     parser.add_argument("interface", help="Interface to use to create fake APs")
     args = parser.parse_args()
-    
-    ssid = args.ssid
     interface = args.interface
-    sta = set()
-    stop_signal = False
-    
+
+    stop_signal = False    
+        
     channel_changer = Thread(target=change_channel)
     channel_changer.daemon = True
     channel_changer.start()
     
     print("Press any key to stop the script")
-    print("STAs trying to connect to ", ssid)
+    print("MAC                  SSID                         dm_Signal")
     sniffer = Thread(target=sniff_sta)
     sniffer.daemon = True
     sniffer.start()
+    
     
     input()
     
@@ -60,6 +64,3 @@ if __name__ == "__main__":
     stop_signal = True
     sniffer.join()
     channel_changer.join()
-
-    
-    main(args)

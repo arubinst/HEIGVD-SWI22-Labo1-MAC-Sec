@@ -86,6 +86,11 @@ def main(args):
     signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
+    # check admin privileges
+    if not os.getuid() == 0:
+        print("Permission denied. Try running this script with sudo.")
+        exit()    
+    
     parser = argparse.ArgumentParser(
         description="Performs a SSID flood attack",
         epilog="This script was developped as an exercise for the SWI course at HEIG-VD")
