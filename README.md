@@ -86,12 +86,22 @@ Le corps de la trame (Frame body) contient, entre autres, un champ de deux octet
 | 39 | Requested from peer QSTA due to timeout                                                                                                                                              |
 | 40 | Peer QSTA does not support the requested cipher suite                                                                                                                                              |
 | 46-65535 | Reserved                                                                                                                                              |
- 
+
 a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
+> ![1](images/1.png)
+>
+> Le code trouvé correspond au code numéro 7 "Class 3 frame received from nonassociated station".
+>
+> Cela veut dire que le client a tenté de transférer des données avant d'être authentifié.
+
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
+
+> Malheureusement, aucun autre code que le 7 n'a pu être trouvé.
+>
+> Le filtre wireshark suivant a été utilisé : `wlan.addr==a4:50:46:d6:31:98` cela permet d'afficher uniquement les trames destinées à l'adresse désirée.
 
 b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
 
@@ -102,13 +112,38 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
+> Les codes 1,4 et 5. 
+>
+> - 1 : la raison n'est pas spécifiée. Cela peut autant être envoyée à la STA cible qu'à l'AP.
+> - 4 : L'AP envoie une trame à la STA lui signalant que la connexion est interrompue car la STA est inactive.
+> - 5 : L'AP n'arrive pas à gérer toutes les connexions, elle envoie alors une trame à la STA lui informant la raison de la déconnexion.
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
+
+> Les codes 1 et 8.
+>
+> - 1 : la raison n'est pas spécifiée. Cela peut autant être envoyée à la STA cible qu'à l'AP.
+> - 8 : La STA informe l'AP qu'elle quitte le BSS.
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
+> En entrant comme adresse cible l'adresse de broadcast : `FF:FF:FF:FF:FF:FF`
+
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
+> Le code 3 est utilisé quand la STA quitte un IBSS ou un ESS alors que le code 8 est utilisé quand la STA quitte un BSS. 
+>
+> Un BSS (Basic Service Set) est composé d'un AP et plusieurs STA.
+>
+> Un IBSS (Independant Basic Service Set) est composé uniquement de STA qui communique directement entre elles.
+>
+> Un ESS(Extended Service Set) contient plusieurs STA mais aussi plusieurs AP.
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+
+> Tant que les requêtes de déauthentification sont envoyées, la cible n'a plus accès au réseau. Si les requêtes ne sont plus envoyées la cible est alors reconnectée au réseau.
+>
+> En utilisant le script, il est possible de définir le code de déconnexion fournit.
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
@@ -150,7 +185,7 @@ A des fins plus discutables du point de vue éthique, la détection de client s'
 ### 4. Probe Request Evil Twin Attack
 
 Nous allons nous intéresser dans cet exercice à la création d'un evil twin pour viser une cible que l'on découvre dynamiquement utilisant des probes.
- 
+
 Développer un script en Python/Scapy capable de detecter une STA cherchant un SSID particulier - proposer un evil twin si le SSID est trouvé (i.e. McDonalds, Starbucks, etc.).
 
 Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twin, vous pouvez très probablement réutiliser du code des exercices précédents ou vous servir d'un outil existant.
