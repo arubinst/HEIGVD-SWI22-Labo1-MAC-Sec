@@ -169,11 +169,11 @@ Développer un script en Python/Scapy capable d'inonder la salle avec des SSID d
 
 **Avec 3 SSIDS générés aléatoirement :**
 
-![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-17-50-02-image.png)
+![](images/2022-03-29-17-50-02-image.png)
 
 **Avec un fichier.txt contenant 3 SSIDs :**
 
-![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-17-54-46-image.png)
+![](images/2022-03-29-17-54-46-image.png)
 
 ## 
 
