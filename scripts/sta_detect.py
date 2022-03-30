@@ -28,9 +28,9 @@ def search_stas():
     Sniff for active probe request on the targeted network
     :return:
     """
-    print("Target network:", args.SSID)
-    print("<STA>")
-    sniff(iface=args.Interface, prn=packet_handler, timeout=args.Timeout)
+    print("Targeted network:", args.SSID)
+    print("<STAs>")
+    sniff(iface=args.Interface, prn=packet_handler)
 
 
 # Args parsing
@@ -40,11 +40,8 @@ parser = argparse.ArgumentParser(prog="Scapy Fake channel Evil Tween attack",
 
 parser.add_argument("-i", "--Interface", required=True,
                     help="The interface that you want to use, needs to be set to monitor mode")
-parser.add_argument("-s", "--SSID", required=False,
-                    help="The SSID of the network to target",
-                    default="")
-parser.add_argument("-t", "--Timeout", required=False, help="The time in seconds to wait before stopping the sniffing",
-                    default=10)
+parser.add_argument("-s", "--SSID", required=True,
+                    help="The SSID of the network to target")
 
 args = parser.parse_args()
 

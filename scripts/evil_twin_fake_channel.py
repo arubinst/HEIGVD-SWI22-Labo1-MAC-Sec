@@ -26,10 +26,8 @@ def packet_handler(p):
                 except:
                     signal = "N/A"
 
-                # Get the channel
                 channel = p[Dot11Beacon].network_stats().get("channel")
 
-                # Get the SSID
                 ssid = p.info.decode("utf-8")
 
                 # Store and display the new BSSID

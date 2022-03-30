@@ -1,9 +1,8 @@
 #!/bin/python3
 import argparse
 
-import netifaces
 from scapy.all import *
-from scapy.layers.dot11 import Dot11ProbeReq, Dot11Beacon, Dot11, Dot11Elt, RadioTap
+from scapy.layers.dot11 import Dot11Beacon, Dot11, Dot11Elt, RadioTap
 
 SSIDs = []
 
@@ -16,7 +15,6 @@ def packet_handler(p):
     if p.haslayer(Dot11):
         # Check for Probe requests
         if p.type == 0 and p.subtype == 4:
-            # Get ssid
             ssid = p.info.decode("utf-8")
             # Null probe requests are discarded
             if ssid != "" and ssid not in SSIDs:
@@ -41,6 +39,7 @@ def select_ssid():
     user_ssid = input("Please select the SSID:\n")
     print("You selected the SSID:", user_ssid)
     return user_ssid
+
 
 def forge_packet(ssid):
     """
