@@ -317,11 +317,25 @@ Développer un script en Python/Scapy capable de reveler le SSID correspondant �
 
 __Question__ : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
 
-Un réseau masqué remplace les caractères de son SSID dans les beacons par des bytes \x00. Nous avons donc commencé par capturer les beacons des réseaux masqués. Puis, pour trouver leurs vrais SSIDs, nous avons sniffer le réseau jusqu'à capturer des Probe Requests envoyés par ces mêmes réseaux masqués contenant leurs SSIDs réels.
+Un réseau masqué remplace les caractères de son SSID dans les beacons par des bytes `\x00`. Nous avons donc commencé par capturer les beacons des réseaux masqués. Puis, pour trouver leurs vrais SSIDs, nous avons sniffé le réseau jusqu'à capturer des Probe Responses envoyées par ces mêmes réseaux masqués contenant leurs SSIDs réels.
 
-Le script commence par détecter tous les beacons dont leurs SSIDs sont "vides" puis essaie de capturer des éventuelles Probe Responses venant des réseaux masqués afin d'obtenir leurs SSIDs réels :
+Le script détecte tout d'abord les beacons envoyés par les réseaux cachés :
 
-![image-20220329233335736](figures/image-20220329233335736.png)
+![image-20220330093955315](figures/image-20220330093955315.png)
+
+Puis, lorsqu'il capture des Probe Responses, il affiche le SSID du réseau masqué et son BSSID associé :
+
+![image-20220330094127794](figures/image-20220330094127794.png)
+
+Dans un même temps, il met à jour le tableau avec le SSID révélé :
+
+![image-20220330094047473](figures/image-20220330094047473.png)
+
+Exemple d'utilisation :
+
+```bash
+sudo python3 reveal_hidden_ssid.py -s 10000
+```
 
 Ici l'option `-s` permet de renseigner une durée (en secondes) pendant lequel le script va sniffer le réseau.
 
