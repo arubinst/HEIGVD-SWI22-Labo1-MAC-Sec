@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from scapy.all import *
+import argparse 
 from threading import Thread
 import pandas
 import time
@@ -50,8 +51,12 @@ def change_channel(stop_signal):
 
 
 if __name__ == "__main__":
-    # interface name
-    interface = "wlp1s0mon"
+    
+    # add all arguments to parser
+    parser = argparse.ArgumentParser(description="A python script to create a fake channel")
+    parser.add_argument('interface', action="store", help="Specify a monitoring interface (ex. mon0)", default=False) 
+    args = parser.parse_args()
+    interface = args.interface
     stop_thread = False
     # start the thread that prints all the networks
     printer = Thread(target=print_all, args=(lambda: stop_thread,))
@@ -62,7 +67,7 @@ if __name__ == "__main__":
     channel_changer.daemon = True
     channel_changer.start()
     # start sniffing
-    sniff(prn=callback, iface=interface, timeout=5)
+    sniff(prn=callback, iface=interface, timeout=10)
     
     # stop threads for sniffing network
     stop_thread = True
