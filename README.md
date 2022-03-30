@@ -159,7 +159,7 @@ L'attaque permet de forger un Beacon frame sur un channel différent, le Beacon 
 
 **Execution du script + wireshark :**
 
-![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-17-16-33-image.png)
+![](images/2022-03-29-17-16-33-image.png)
 
 On remarque que les nouvelles frames forgées proviennent bien du BSSID evil (00:c0:ca:3f:b7:4a) avec le même SSID de l'AP choisi (Centre-de-Podologie)
 
@@ -214,7 +214,7 @@ __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils p
 
 **Execution du script + Wireshark :**
 
-![](/home/miguel/Cours/SWI/Labos/01/assets/2022-03-29-19-00-43-image.png)
+![](images/2022-03-29-19-00-43-image.png)
 
 On remarque qu'un SSID n'a pas tout de suite été trouvé, celà est du au fait qu'il n'y avait pas d'actives probe requests à proximité. Finalement, nous avons pu forger des beacons frames sur l'SSID entré par l'utilisateur (Salt_2GHz_0ED413_5GHz).
 
