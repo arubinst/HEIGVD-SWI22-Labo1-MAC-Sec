@@ -178,6 +178,22 @@ L'objectif est de faire croire que la victime va se connecter à son access poin
 
 Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.
 
+Lancer dans script:
+
+```bash
+sudo python3 ssidflood.py <file> <interface>
+```
+
+Avec file la liste des SSID à créer
+
+Une fois le script lancé, ce dernier lance des trame pour les fake SSID:
+
+![](images/ssid01.png)
+
+Une fois le script arrêté, le script arrête proprement les fake AP:
+
+![](images/ssid02.png)
+
 
 ## Partie 2 - probes
 
