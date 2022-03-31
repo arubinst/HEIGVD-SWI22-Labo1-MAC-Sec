@@ -279,8 +279,11 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 ### 6. Hidden SSID reveal (exercices challenge optionnel - donne droit à un bonus)
 
 Développer un script en Python/Scapy capable de reveler le SSID correspondant à un réseau configuré comme étant "invisible".
+> Le script est disponible dans scripts/script7.py
+> ![1](images/script7.png)
 
 __Question__ : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
+>Lorsqu'une AP est cachée, son SSID est en réalité composé de 4 bytes 0x00. En capturant un paquet ayant comme SSID la chaine de 4 bytes, on peut définir qu'elle est cachée. On enregistre son adresse MAC, et on attend que l'AP réponde à une Probe Request avec une Prob Response, on y trouvera le SSID associé
 
 
 
