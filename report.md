@@ -2,7 +2,7 @@
 
 > Auteurs: Jean-Luc Blanc & Noémie Plancherel
 >
-> Date: 27.03.22
+> Date: 31.03.22
 
 ## Deauthentication attack
 
@@ -59,6 +59,8 @@ Le code 8 est pour BSS (Basic Service Set) et le code 3 est pour IBSS (Independa
 
 La cible se retrouve déconnectée du réseau sans fil dû à la récéption de trames de déhauthentification.
 
+------
+
 **Fonctionnement**
 
 Nous avons choisi d'ajouter la cible, l'AP ainsi que l'interface en arguments du script python. Il y a également 3 autres paramètres optionnels:
@@ -81,7 +83,9 @@ Nous allons déconnecter la station de l'AP en envoyant des trames de déhauthen
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
-L'attaque va créer un faux point d'accès sur un nouveau channel en se basant sur un réseau qui existe déjà. 
+L'attaque va créer un faux point d'accès sur un nouveau channel en se basant sur un réseau qui existe déjà. Cela va permettre de spoofer l'AP et de récupérer du trafic privé d'utilisateurs comme des mots de passe.
+
+------
 
 **Fonctionnement**
 
@@ -137,24 +141,26 @@ Avec la capture ci-dessous, nous pouvons voir les 3 différents AP avec des adre
 
 ## Probe Request Evil Twin Attack
 
-**Fonctionnement** : 
-
-Il faut d'abord écrire la commande `sudo python3 script.py wlan0 -s "HEIG-VD" -l` où `HEIG-VD` indique le SSID que l'ont cherche.
-Voici le résultat : 
-
-![](images/4_2.PNG)
-
 **Question** : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 
-```
-Ces trames doivent pouvoir être accessible par tout le monde puisque c'est le système utilisé pour détecter les Wi-Fi aux alentours.
-```
+Ces trames doivent pouvoir être accessibles par tout le monde puisque c'est le système utilisé pour détecter les Wi-Fi aux alentours.
 
 **Question** : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
 
-```
-Parce que le MAC est désormais randomisé à chaque connection
-```
+Parce que le MAC est désormais randomisé à chaque connexion.
+
+------
+
+**Fonctionnement** 
+
+Voici les arguments obligatoires:
+
+![](images/5_8.png)
+
+Il faut d'abord écrire la commande `sudo ./script.py wlan0 "HEIG-VD"` où `HEIG-VD` indique le SSID que l'ont cherche.
+Voici le résultat : 
+
+![](images/4_2.PNG)
 
 ## Détection de clients et réseaux
 
@@ -170,19 +176,41 @@ Ainsi, nous avons lancé le script en cherchant le ssid `HEIG-VD`:
 
 ![](images/4_1.png)
 
-
+------
 
 b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
 
-**Fonctionnement** :
+**Fonctionnement**
 
-Pour lancer le script il faut taper la commande suivante : `sudo python3 link_sta_ap.py wlan0`
+Nous avons ajouté l'interface en argument du script:
+
+![](images/5_7.png)
+
+Ainsi, pour lancer le script il faut taper la commande suivante : 
+
+```sh
+sudo ./link_sta_ap.py wlan0
+```
 
 Voici le résultat : 
 
-![](images\5_4.PNG)
+![](images/5_4.PNG)
 
 On confirme le résultat en faisant un airodump sur la même interface afin de vérifier le BSSID correspondant à une des STA : 
 
-![](images\5_6.PNG)
+![](images/5_6.PNG)
+
+## Hidden SSID reveal
+
+**Question** : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
+
+
+
+------
+
+**Fonctionnement**
+
+Nous avons ajouté l'interface comme argument du script:
+
+![](images/6_0.png)
 
