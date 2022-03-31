@@ -14,7 +14,7 @@ reasons = { 1 : True,
 
 # For type verification
 def mac_address(adr):
-	if re.search(r"^[a-fA-F0-9]{2}(:[a-fA-F0-9]){5}$", adr):
+	if re.search(r"^[a-fA-F0-9]{2}(:[a-fA-F0-9]{2}){5}$", adr):
 		return adr
 	else:
 		raise TypeError()

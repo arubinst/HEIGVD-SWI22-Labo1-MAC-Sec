@@ -34,7 +34,7 @@ def sniff_sta():
 
 if __name__ == "__main__":
 
-    exit()
+    #exit()
     # check admin privileges
     if not os.getuid() == 0:
         print("Permission denied. Try running this script with sudo.")
