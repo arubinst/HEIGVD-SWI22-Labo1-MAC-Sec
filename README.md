@@ -127,10 +127,10 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 Lancer le script ainsi:
 
 ```bash
-sudo python3 deauth.py <MAC STA> <MAC AP> <interface>
+sudo python3 1_deauth.py <MAC STA> <MAC AP> <interface>
 ```
 
-Le script envoie par défaut 10 trames:
+Le script envoie par défaut 10 trames (changable avec le  paramètre `--count`):
 
 ![](images/deauth01.png)
 
@@ -181,18 +181,18 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 Lancer la commande dans scripts:
 
 ```bash
-sudo python3 fakeChannelEvilTwinAttack.py <interface>
+sudo python3 2_fakeChannelEvilTwinAttack.py <interface>
 ```
 
 Pendant les dix premières secondes, le temps d'itérer sur toutes les channels, le script scanne les SSID et en fait une liste. A la fin de du scan, il est demandé à l'utilisateur d'entrer le BSSID à attaquer:
 
 ![](images/fake01.png)
 
-Ensuite, un thread commence pour faire un evil à 6 channels d'écart:
+Ensuite, un thread commence pour faire un evil twin à 6 channels d'écart:
 
 ![](images/fake02.png)
 
-Finalement, le main vérifie toutes les dix secondes si le tween est sur la nouvelle channel (avec l'adresse MAC de l'utilisateur):
+Finalement, le main vérifie toutes les dix secondes si le twin est sur la nouvelle channel (avec l'adresse MAC de l'utilisateur):
 
 ![](images/fake03.png)
 
@@ -212,18 +212,18 @@ Développer un script en Python/Scapy capable d'inonder la salle avec des SSID d
 Lancer dans script:
 
 ```bash
-sudo python3 ssidflood.py <file or count> <interface>
+sudo ./3_ssidFlood.py <file or count> <interface>
 ```
 
 Dans le 1er argument on peut soit donner un entier qui générera le nombre donné de SSID random, ou un fichier comprenant des SSID séparés par des retours à la ligne
 
-Une fois le script lancé, ce dernier lance des trame pour les fake SSID:
-
-
+Une fois le script lancé, ce dernier lance des trame Beacon pour les fake SSID:
 
 ![](images/ssid01.png)
 
-Une fois le script arrêté, le script arrête proprement les fake AP:
+Résultat: 
+
+Une fois le signal d'arrêt envoyé (Ctrl + C), le script arrête proprement les threads des fake AP:
 
 ![](images/ssid02.png)
 
@@ -264,7 +264,7 @@ Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twi
 Dans scripts, lancez:
 
 ```bash
-sudo python3 probeRequestEvilTwinAttack.py <interface>
+sudo python3 4_probeRequestEvilTwinAttack.py <interface>
 ```
 
 Le script vous salue avec votre adresse MAC. Et vous demande le SSID à trouver:
@@ -318,6 +318,18 @@ __Question__ : expliquer en quelques mots la solution que vous avez trouvée pou
 Nous n'avons pas eu le temps d'écrire un script, mais nous avons quand même fait quelques recherches à ce propos:
 
 Les AP qui cachent leurs SSID ne font qu'envoyer des Beacons qui ont un champ 'SSID' vide. Cependant, tous les autres échanges de données enrte un client et l'AP "invisible" ne cachent pas le SSID et on peut alors connaître le nom du réseau même s'il n'est pas annoncé par l'AP.
+
+Le fonctionnement d'un tel script serait le suivant:
+
+>   Un dictionnaire qui prend pour clé une adresse MAC et comme valeur un SSID
+>
+>   Pour chaque paquet:
+>
+>   1.  Si c'est un paquet Beacon avec SSID caché et n'est pas encore gardée en mémoire:
+>       1.   garder en mémoire l'adresse MAC de l'AP
+>   2.  Si c'est un paquet destiné à l'une des adresses MAC retenues __et__ n'a pas encore de SSID révélée, __et__ que le type du paquet donne l'info sur le SSID (p.ex Authentication):
+>       1.  Afficher le SSID et le MAC de l'AP
+>       2.  Associer le SSID avec sa MAC address dans le dictionnaire
 
 Quelques pistes utiles: 
 
