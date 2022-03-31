@@ -9,28 +9,16 @@ import os
 hashs = set()
 aps = dict()
 
-
 def callback(packet):
-    # Probe response = AP is present nearby. Add it to the list of APs
-    if packet.haslayer(Dot11ProbeRes): 
-        ssid = packet.info.decode('utf-8')
-        mac = packet.addr2
-        aps[mac] = ssid
-
     # Auth = STA is connected/connecting to the AP with the given MAC
-    if packet.haslayer(Dot11Auth):
+    if packet.haslayer(Dot11AssoReq) or packet.haslayer(Dot11ReassoReq):
         sta_mac = packet.addr2
         ap_mac = packet.addr1
-
-        if ap_mac in aps: # if we know the ssid of ap_mac
-            ssid = aps[packet]
-            h = ssid + sta_mac
-
-            if h not in hashs: # print only once
-                hashs.add(h)
-                print(f"{sta_mac}    {ssid.ljust(25)}    {packet.ap_mac}")
-
-
+        ssid = packet.info.decode("utf-8")
+        h = sta_mac + ap_mac
+        if h not in hashs: # print only once
+            hashs.add(h)
+            print(f"{sta_mac}    {ssid.ljust(25)}    {ap_mac}")
             
 def change_channel():
     ch = 1
@@ -46,6 +34,7 @@ def sniff_sta():
 
 if __name__ == "__main__":
 
+    exit()
     # check admin privileges
     if not os.getuid() == 0:
         print("Permission denied. Try running this script with sudo.")
