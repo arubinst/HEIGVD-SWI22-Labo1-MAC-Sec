@@ -6,7 +6,7 @@ import time
 import os
 
 IFACE = 'wlan0'         # Nom de l'interface ici
-# fortement inspiré de https://www.thepythoncode.com/code/building-wifi-scanner-in-python-scapy
+# Fortement inspiré de https://www.thepythoncode.com/code/building-wifi-scanner-in-python-scapy
 # Initialise le dataframe des réseaux qui contiendra tous les access points aux alentours
 networks = pandas.DataFrame(columns=["BSSID", "SSID", "dBm_Signal", "Channel"])
 # Set l'index BSSID (adresse MAC de l'access point)
@@ -42,7 +42,7 @@ def change_channel():
     ch = 1
     while isScanning:
         os.system(f"iwconfig {IFACE} channel {ch}")
-        # switch channel from 1 to 14 each 0.5s
+        # Change de canal de 1 à 14 toutes les 0.5 secondes
         ch = ch % 14 + 1
         time.sleep(0.5)
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     evilChannel = (network['Channel'] + 6) % 14
     os.system(f"iwconfig {IFACE} channel {evilChannel[0]}")
 
-# inspiré de https://www.4armed.com/blog/forging-wifi-beacon-frames-using-scapy/
+# Inspiré de https://www.4armed.com/blog/forging-wifi-beacon-frames-using-scapy/
     dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',
                   addr2='22:22:22:22:22:22', addr3='33:33:33:33:33:33')
     beacon = Dot11Beacon(cap='ESS+privacy')
