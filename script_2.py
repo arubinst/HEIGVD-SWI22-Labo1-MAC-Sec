@@ -38,11 +38,11 @@ def scan(pkt):
         if [pkt.addr2, pkt.info, channel] not in ap_list:
             
             try:
-                dbm_signal = packet.dbm_signal
+                dbm_signal = packet.dBm_AntSignal
             except:
                 dbm_signal = "N/A"
             
-            print("Index:", len(ap_list), "  AP:", pkt.addr2, "  Channel:", channel, "  SSID:", pkt.info.decode())
+            print("Index:", len(ap_list), "  AP:", pkt.addr2, "  Channel:", channel, "  SSID:", pkt.info.decode(), "  Signal:", dbm_signal)
             ap_list.append([pkt.addr2, pkt.info, channel])
 
 
