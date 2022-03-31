@@ -226,7 +226,7 @@ a) Développer un script en Python/Scapy capable de lister toutes les STA qui ch
 
 **Execution du script:**
 
-![loading-ag-1100](/home/miguel/Desktop/Cours/SWI/Labos/01/assets/6912b6f5304e68c68130174bcc887339441b572b.png)
+![loading-ag-1100](images/2022-03-30-17-07-21-image.png)
 
 b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
 
@@ -240,7 +240,7 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 
 **Execution du script:**
 
-![a](/home/miguel/Desktop/Cours/SWI/Labos/01/assets/c472c0386ec96a65e1747dbf9d6b7fb56c3ab04f.png)
+![a](images/2022-03-30 21-43-59.png)
 
 ### 6. Hidden SSID reveal (exercices challenge optionnel - donne droit à un bonus)
 
