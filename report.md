@@ -139,7 +139,10 @@ Avec la capture ci-dessous, nous pouvons voir les 3 différents AP avec des adre
 
 **Fonctionnement** : 
 
+Il faut d'abord écrire la commande `sudo python3 script.py wlan0 -s "HEIG-VD" -l` où `HEIG-VD` indique le SSID que l'ont cherche.
+Voici le résultat : 
 
+![](images/4_2.PNG)
 
 **Question** : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 
@@ -173,12 +176,13 @@ b) Développer un script en Python/Scapy capable de générer une liste d'AP vis
 
 **Fonctionnement** :
 
-Voici comment lancer le script : 
+Pour lancer le script il faut taper la commande suivante : `sudo python3 link_sta_ap.py wlan0`
 
-![](\images\5_5.PNG)
+Voici le résultat : 
 
-![](\images\5_4.PNG)
+![](images\5_4.PNG)
 
 On confirme le résultat en faisant un airodump sur la même interface afin de vérifier le BSSID correspondant à une des STA : 
 
-![](\images\5_6.PNG)
+![](images\5_6.PNG)
+
