@@ -89,20 +89,27 @@ Le corps de la trame (Frame body) contient, entre autres, un champ de deux octet
 
 a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.
 
+Adresse ciblée : `c0:ee:fb:e2:4f:1f`
+Adresse AP: `dc:a5:f4:60:c2:b0`
+
+Commande pour l'attaque:
+
+```bash
+sudo aireplay-ng -0 10 -c c0:ee:fb:e2:4f:1f -a dc:a5:f4:60:c2:b0 wlan0
+```
+
+
+
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
->   Adresse ciblée : `c0:ee:fb:e2:4f:1f`
->   Adresse AP: `dc:a5:f4:60:c2:b0`
->
->   Filtre wireshark pour ne voir que l'adresse ciblée: `wlan.addr == c0:ee:fb:e2:4f:1f`
->
->   Commande pour l'attaque:
->
->   ```bash
->   sudo aireplay-ng -0 10 -c c0:ee:fb:e2:4f:1f -a dc:a5:f4:60:c2:b0 wlan0
->   ```
->
->   
+Le code n°7 est utilisé par aircrack pour déauthentifier le client. 
+
+L'interprétation de ce code n'est pas très claire car les sources ne disent pas la même chose. L'explication la plus plausible est que ce code indique que le client a reçu des données d'une STA qui n'a pas encore été associée et demande alors une déauthentification.
+
+Sources: 
+
+-   https://support.zyxel.eu/hc/en-us/articles/360009469759-What-is-the-meaning-of-802-11-Deauthentication-Reason-Codes-
+-   https://www.rfwireless-world.com/Terminology/WLAN-authentication-deauthentication-frame.html
 
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
 
@@ -123,12 +130,6 @@ Lancer le script ainsi:
 sudo python3 deauth.py <MAC STA> <MAC AP> <interface>
 ```
 
-MAC STA  => Le MAC de la station
-
-MAC AP => Le MAC de l'AP
-
-interface => L'interface utilisée pour l'attaque
-
 Le script envoie par défaut 10 trames:
 
 ![](images/deauth01.png)
@@ -137,27 +138,37 @@ Les options suivantes sont disponibles:
 
 ![](images/deauth02.png)
 
+
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
->   https://support.zyxel.eu/hc/en-us/articles/360009469759-What-is-the-meaning-of-802-11-Deauthentication-Reason-Codes-
+-   1: Non spécifié donc peut être envoyé à n'importe qui
+-   5: Lorsque l'AP est surchargé il peut demander la déauthentification au client afin de libérer des ressources si le client se connecte à un autre AP du même SSID
 
-Disassociated due to inactivity 
+
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
 
->   
+-   1: Non spécifié donc peut être envoyé à n'importe qui
+-   4: Si le client désactive automatiquement son WiFi lorsqu'il n'utilise pas le réseau pendant un certain temps
+-   8: Lorsque le client a quitté la zone et s'est connecté à un autre AP ayant un meilleur signal
+
+
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
->   En indiquant l'adresse de broadcast comme cible de l'attaque
+En indiquant l'adresse de broadcast comme cible de l'attaque: `ff:ff:ff:ff`
 
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
->   
+La nuance est dans le mot "Disassociated": 
+
+-   3: le client se déauthentifie uniquement, car il n'y a pas d'autre AP disponible autour de lui et le signal est insuffisant pour garder une connexion
+-   8: le client désassocie l'AP pour s'associer à un autre AP plus proche de lui
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
->    L'attaque force la cible à se désauthentifier de l'AP, et va immédiatement recommencer le 4-way handshake, qui lorsqu'il est capturé, peut être utilisé dans d'autres attaques. 
+L'attaque force la cible à se désauthentifier de l'AP, et va immédiatement recommencer le 4-way handshake, qui lorsqu'il est capturé, peut être utilisé dans d'autres attaques. 
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
@@ -173,7 +184,7 @@ Lancer la commande dans scripts:
 sudo python3 fakeChannelEvilTwinAttack.py <interface>
 ```
 
-Pendant les dix premières secondes, le temps d'itérer sur toutes les channels, le script scan les SSID et en fait une liste. A la fin de du scan, il est demandé à l'utilisateur d'entrer le BSSID à attaquer:
+Pendant les dix premières secondes, le temps d'itérer sur toutes les channels, le script scanne les SSID et en fait une liste. A la fin de du scan, il est demandé à l'utilisateur d'entrer le BSSID à attaquer:
 
 ![](images/fake01.png)
 
@@ -201,18 +212,24 @@ Développer un script en Python/Scapy capable d'inonder la salle avec des SSID d
 Lancer dans script:
 
 ```bash
-sudo python3 ssidflood.py <file> <interface>
+sudo python3 ssidflood.py <file or count> <interface>
 ```
 
-Avec file la liste des SSID à créer
+Dans le 1er argument on peut soit donner un entier qui générera le nombre donné de SSID random, ou un fichier comprenant des SSID séparés par des retours à la ligne
 
 Une fois le script lancé, ce dernier lance des trame pour les fake SSID:
+
+
 
 ![](images/ssid01.png)
 
 Une fois le script arrêté, le script arrête proprement les fake AP:
 
 ![](images/ssid02.png)
+
+Preuve de fonctionnement: 
+
+
 
 
 ## Partie 2 - probes
@@ -254,7 +271,7 @@ Le script vous salue avec votre adresse MAC. Et vous demande le SSID à trouver:
 
 ![](images/probe01.png)
 
-Le script va itérer pendant 10 secondes sur toutes les channels pour trouver le SSID. Si le SSID n'est pas trouvé, le script scan le nouveau à nouveau pendant 10 secondes. L'opération est répétée tant que le SSID n'a pas été trouvé. Quand le SSID est trouvé, son adresse MAC est imprimée et il est demander à l'utilisateur sur quelle channel il veut faire le Twin de ce ssid.
+Le script va itérer pendant 10 secondes sur toutes les channels pour trouver le SSID. Si le SSID n'est pas trouvé, le script scanne à nouveau pendant 10 secondes. L'opération est répétée tant que le SSID n'a pas été trouvé. Quand le SSID est trouvé, son adresse MAC est affichée et il est demander à l'utilisateur sur quel channel il veut faire le Twin de ce ssid.
 
 ![](images/probe02.png)
 
@@ -265,15 +282,17 @@ Pour vérifier que le clone fonctionne, il est vérifié que le SSID apparaisse 
 
 
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
-	
-	Les trames ne sont pas chiffrées, car il faut pouvoir partager un secret avec la STA et l'AP
-	Si plusieurs AP partagent le réseau, il faudrait que la clé de chiffrement partagée entre une AP et une STA, soit partagée avec tous les AP de ce réseau. Cela est compliqué.
+
+Les trames ne sont pas chiffrées, car il faut pouvoir partager un secret avec la STA et l'AP
+Si plusieurs AP partagent le réseau, il faudrait que la clé de chiffrement partagée entre une AP et une STA, soit partagée avec tous les AP de ce réseau. Cela est compliqué.
+
+
 
 
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
 
-	Car les adresses MAC sont randomisées maintenant:
-	https://www.extremenetworks.com/extreme-networks-blog/wi-fi-mac-randomization-privacy-and-collateral-damage/
+Car les adresses MAC sont randomisées maintenant:
+https://www.extremenetworks.com/extreme-networks-blog/wi-fi-mac-randomization-privacy-and-collateral-damage/
 
 ### 5. Détection de clients et réseaux
 
@@ -296,7 +315,14 @@ Développer un script en Python/Scapy capable de reveler le SSID correspondant �
 
 __Question__ : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
 
+Nous n'avons pas eu le temps d'écrire un script, mais nous avons quand même fait quelques recherches à ce propos:
 
+Les AP qui cachent leurs SSID ne font qu'envoyer des Beacons qui ont un champ 'SSID' vide. Cependant, tous les autres échanges de données enrte un client et l'AP "invisible" ne cachent pas le SSID et on peut alors connaître le nom du réseau même s'il n'est pas annoncé par l'AP.
+
+Quelques pistes utiles: 
+
+-   https://netpacket.net/2020/08/finding-hidden-ssids/
+-   https://www.7signal.com/news/blog/controlling-beacons-boosts-wi-fi-performance
 
 ## Livrables
 
