@@ -57,7 +57,7 @@ if __name__ == "__main__":
     channel_changer.daemon = True
     channel_changer.start()
     # Démarre le sniffing
-    sniff(prn=callback, IFACE=IFACE, timeout=10)
+    sniff(prn=callback, iface=IFACE, timeout=10)
     # On arrête de scanner et d'afficher les SSID dispos et on arrête les threads
     isPrinting = False
     isScanning = False
