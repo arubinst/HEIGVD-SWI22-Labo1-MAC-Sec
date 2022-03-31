@@ -17,8 +17,10 @@ def find(p):
         bssid = p[Dot11].addr3
         if p.haslayer(Dot11Beacon) and bssid not in hidden_ssid.keys() and ssid == "":
             hidden_ssid[bssid] = "SSID hidden"
+            print(hidden_ssid) 
         elif (p.type == 0 and p.subtype == 5) and bssid in hidden_ssid.keys():
             hidden_ssid[bssid] = ssid
+            print(hidden_ssid) 
 
 # our main function             
 if __name__ == "__main__":
@@ -26,6 +28,5 @@ if __name__ == "__main__":
     parser.add_argument('interface', action="store", help="Specify a monitoring interface (ex. mon0)", default=False)
     args = parser.parse_args()
     sniff(iface=args.interface,prn=find, store=0)
-    print(hidden_ssid)                 
     print ("\n")
     print ("Exiting!")

@@ -220,3 +220,4 @@ Nous avons ajouté l'interface comme argument du script:
 
 ![](images/6_0.png)
 
+![](images/7_2.png)
