@@ -30,7 +30,7 @@ def packet_handler(p):
 
             # Store and display the new BSSID
             BSSIDs[bssid] = (signal, channel, ssid)
-            print("{} {:^17} {:^9} {}".format(bssid, signal, channel, ssid))
+            print("{} {:^17} {:^9} {}".format(bssid, signal, channel if channel is not None else "None", ssid))
 
 
 def search_ap():
