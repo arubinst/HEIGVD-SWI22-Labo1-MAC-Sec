@@ -90,8 +90,15 @@ Le corps de la trame (Frame body) contient, entre autres, un champ de deux octet
 a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
+**Réponse** : Le code utilisé par aircrack pour déauthentifier le client est le code 7.
+Son interprétation est : 
+Class 3 frame received from nonassociated station
+Ici, le client aurait essayé de transférer des données avant d'être associé à l'AP
 
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
+	
+**Réponse** : Pas de trames de déauthentification trouvée pour le moment.
+
 
 b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
 
@@ -101,14 +108,35 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 * 8 - Deauthenticated because sending STA is leaving BSS
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
+**Réponse**
+Si un AP souhaite se déconnecter de la STA cible il va envoyer une trame de déauthentification.
 
+Par exemple,
+
+Pour le code 5, l'AP est incapable de gérer toutes les STAs, donc il envoie une trame de deauthentification pour éviter la surcharge
+
+Pour le code 4, la session du client a dépassé un certain timeout en étant inactif, l'AP va donc envoyer une trame de déauthentification pour éviter la surcharge
+
+Pour le code 1, la raison n'est pas spécifiée alors la trame de désauthentification peut venir de l'AP à destination de la STA
+	
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
+	
+**Réponse** : Si une STA souhaite se déconnecter de l'AP cible il va envoyer une trame de déauthentification.
+
+Pour le code 8, l'OS a déplacé le client vers un autre AP, le client va donc envoyer une trame de déauthentification à l'AP
+
+Pour le code 1, la raison n'est pas spécifiée alors la trame de désauthentification peut venir de la STA à destination de l'AP
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
+**Réponse** : On pourrait essayer d'envoyer des trames de déauthentification en broadcast.	
 
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
+	
+**Réponse** : Le code 3 signifie que l'AP est offline, ce qui déauthentifie le client tandis que le code 8 signfie que le client s'est authentifié à un autre AP, ce qui déauthentifie l'AP auquel il était précédemment appairé.
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+	
+**Réponse** : Lorsqu'on envoie une trame de déauthentification à une cible donné, cette cible n'a pas le choix que de se déauthentifier à la réception de cette trame.
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
