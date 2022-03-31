@@ -86,12 +86,26 @@ Le corps de la trame (Frame body) contient, entre autres, un champ de deux octet
 | 39 | Requested from peer QSTA due to timeout                                                                                                                                              |
 | 40 | Peer QSTA does not support the requested cipher suite                                                                                                                                              |
 | 46-65535 | Reserved                                                                                                                                              |
- 
+
 a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
+![image-20220310161439054](figures/image-20220310161439054.png)
+
+On voit donc qu'il s'agit du code 7. Cela indique que le client a tenté de transférer des données avant son association.
+
+
+
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
+
+Oui nous en avons trouvé une autre avec un autre Reason Code :
+
+![image-20220310161834402](figures/image-20220310161834402.png)
+
+Ici, il s'agit du code 2. Cela indique que le client s'est associé mais n'est pas autorisé.
+
+
 
 b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
 
@@ -102,13 +116,55 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
+Ce sont les codes 4 et 5 qui justifient l'envoi de la trame à la STA cible. En effet l'AP peut envoyer une trame de désauthentification avec le code 4 à la STA cible en raison de son inactivité sur le réseau. 
+
+Pour ce qui est du code 5, si l'AP n'est pas capable de traiter toutes les STAs actuellement associées, il peut envoyer ce code-là pour désauthentifier la STA cible.
+
+Cependant, le code 1 pourrait également être envoyé par l'AP à la STA cible étant donné que la raison n'est pas spécifiée. Pour des raisons de simplicité du script, le code 1 est toujours envoyé par la STA vers l'AP cible.
+
+
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
+
+C'est le code 8 qui justifie l'envoi de la trame à l'AP cible. En effet, c'est à la STA de dire à l'AP qu'elle quitte le BSS (Basic Service Set).
+
+Comme pour la question précédente, le code 1 pourrait être envoyé autant par la STA que par l'AP. Ici, nous avons défini que c'était la STA qui envoyait ce code à l'AP cible dans le script.
+
+
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
+Il suffit de mettre l'adresse MAC `FF:FF:FF:FF:FF:FF` comme adresse cible afin de désauthentifier toutes les STAs connectées à l'AP choisi. 
+
+Il a été intéressant de constater qu'en lançant le script avec cette adresse de broadcast comme adresse cible, cela ne fonctionne pas avec les Reason Codes 1 et 8. Dans ces deux cas, il faut renseigner l'adresse MAC d'une STA en particulier. Ce qui est assez logique pour le code 8 car il est censé venir d'une STA bien précise vers l'AP pour indiquer qu'elle quitte le BSS. Par contre pour ce qui est du code 1, cela est peut-être dû au fait qu'il n'est pas possible de déconnecter toutes les STAs en fournissant une raison non-spécifiée.
+
+
+
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
+Dans les deux cas, cela indique que la STA quitte le Service Set auquel elle était connectée. Mais la nuance est que le code 3 indique qu'elle a quitté le Service Set IBSS (Independant Basic Service Set) ou le Service Set ESS (Extended Service Set) alors que le code 8 indique qu'elle a quitté le Service Set BSS (Basic Service Set).
+
+Caractéristiques de ces 3 modes d'opération : 
+
+- **IBSS** : Réseau sans-fil n'utilisant pas de point d'accès et n’étant constitué que d’équipements clients qui communiquent entre eux sans aucune fonction de contrôle, de gestion de la sécurité ou de statistique centralisée. Réseau "ad-hoc" ou "peer-to-peer".
+- **ESS** : Réseau sans fil, créé par plusieurs points d'accès, qui apparaît aux utilisateurs comme un réseau unique et homogène, tel qu'un réseau couvrant une maison ou un bureau qui est trop grand pour être couvert de manière fiable par un seul point d'accès. Les points d'accès sont reliés entre eux par un DS (Distribution System).
+- **BSS** : Réseau sans-fil classique que l'on trouve dans la majorité des cas, identifié par un BSSID, formé par un AP et les stations situées dans sa zone de couverture.
+
+
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+
+La cible est directement déconnectée du réseau et perd donc l'accès à Internet tant que les trames de désauthentification lui sont envoyées. Elle tente donc de se connecter à un autre réseau pouvant lui fournir un accès.
+
+Il a été intéressant de voir que si l'on envoie suffisamment de trames de désauthentification à une STA cible, elle met un certain temps à se reconnecter au réseau, il a même été des fois nécessaire de la reconnecter manuellement après l'attaque.
+
+
+
+Le script demande d'entrer l'adresse MAC cible, le BSSID de l'AP auquel la cible est connectée (ici on souhaite déconnecter tout le monde du réseau) puis d'entrer un Reason Code et envoie finalement les trames de désauthentification : 
+
+![image-20220329180055800](figures/image-20220329180055800.png)
+
+
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
@@ -120,10 +176,46 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
+On annonce avec ces beacons que le réseau est disponible sur un autre canal, la cible peut alors s'y connecter. Elle n'aura cependant pas de connexion sur ce canal car il n'y pas de réseau sur cette fréquence. On pourrait disposer d'un AP malicieux sur ce canal afin de récupérer les informations de la cible qui transitent. Combinée à l'attaque par désauthentification du point précédent, on pourrait dans un premier temps déconnecter la cible puis, dans un deuxième temps, envoyer des beacons forgés afin qu'elle se connecte sur notre réseau malicieux.
+
+
+
+Le script demande d'entrer le BSSID du réseau de l'evil twin comme argument, affiche les différents réseaux détectés en fonction des beacons capturés puis propose de se faire passer pour un de ces réseaux en entrant son BSSID. Finalement il envoie des beacons avec le SSID du réseau usurpé sur un canal situé à 6 canaux d'écart du vrai réseau  :
+
+![image-20220329182343676](figures/image-20220329182343676.png)
+
+Exemple d'utilisation du script : 
+
+```bash
+sudo python3 evil_twin.py 38:00:25:8E:A4:E5
+```
+
+
+
 
 ### 3. SSID flood attack
 
 Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.
+
+Ici le script génère les beacons de 4 SSIDs aléatoires possédant tous une adresse MAC aléatoire :
+
+![image-20220329200437451](figures/image-20220329200437451.png)
+
+On les voit ensuite apparaître dans une capture Wireshark :
+
+![image-20220329200600581](figures/image-20220329200600581.png)
+
+
+
+Par contre ici, le script génère les beacons de 4 SSIDs contenus dans le fichier `ssid_list.txt`  avec également des adresses MAC aléatoires :
+
+![image-20220329201012337](figures/image-20220329201012337.png)
+
+Même chose ici, on peut les voir apparaître dans une capture Wireshark :
+
+![image-20220329201238803](figures/image-20220329201238803.png)
+
+
 
 
 ## Partie 2 - probes
@@ -150,19 +242,51 @@ A des fins plus discutables du point de vue éthique, la détection de client s'
 ### 4. Probe Request Evil Twin Attack
 
 Nous allons nous intéresser dans cet exercice à la création d'un evil twin pour viser une cible que l'on découvre dynamiquement utilisant des probes.
- 
+
 Développer un script en Python/Scapy capable de detecter une STA cherchant un SSID particulier - proposer un evil twin si le SSID est trouvé (i.e. McDonalds, Starbucks, etc.).
 
 Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twin, vous pouvez très probablement réutiliser du code des exercices précédents ou vous servir d'un outil existant.
 
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 
+Cela rendrait plus complexe la recherche de réseaux car cela impliquerait une gestion de clé pour que l'AP ciblé déchiffre la Probe Request avant même que la STA soit authentifiée auprès de lui. De plus, la randomisation des adresses MAC limite déjà correctement l'impact de cette attaque et les STAs envoient moins de Probe Requests qu'à l'époque.
+
+
+
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
+
+Car ils sont capables de randomiser leur adresse MAC et ne peuvent donc plus être identifiés lorsqu'ils envoient une Probe Request afin de trouver un réseau.
+
+
+
+Le script requiert le BSSID du réseau de l'evil twin comme argument. Il affiche ensuite les Probe Requests détectées et dans un même temps les réseaux disponibles aux alentours. Puis, il demande à l'utilisateur d'entrer le SSID du réseau qu'il veut usurper. Si le réseau a bien été détecté à proximité, le script va générer des beacons avec son SSID sur un canal situé à 6 canaux d'écart du vrai réseau :
+
+![image-20220329210545514](figures/image-20220329210545514.png)
+
+Exemple d'utilisation :
+
+```bash
+sudo python3 probe_attack.py 38:00:25:8E:A4:E5
+```
+
+
 
 
 ### 5. Détection de clients et réseaux
 
 a) Développer un script en Python/Scapy capable de lister toutes les STA qui cherchent activement un SSID donné
+
+Le script requiert le SSID qui doit être présent dans les Probe Requests comme argument. Puis il affiche les adresses MAC des appareils qui ont fait des Probe Requests demandant le SSID choisi :
+
+![image-20220329214506453](figures/image-20220329214506453.png)
+
+Exemple d'utilisation :
+
+```bash
+sudo python3 detecting_sta.py WOW
+```
+
+
 
 b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
 
@@ -174,12 +298,46 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 
 00:0E:35:C8:B8:66 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 
+Le script affiche les BSSIDs et SSIDs des APs détectés aux alentours ainsi que les STAs associées à ceux-ci :
+
+![image-20220329222059612](figures/image-20220329222059612.png)
+
+Exemple d'utilisation :
+
+```bash
+sudo python3 detecting_associated_sta.py
+```
+
+
+
 
 ### 6. Hidden SSID reveal (exercices challenge optionnel - donne droit à un bonus)
 
 Développer un script en Python/Scapy capable de reveler le SSID correspondant à un réseau configuré comme étant "invisible".
 
 __Question__ : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
+
+Un réseau masqué remplace les caractères de son SSID dans les beacons par des bytes `\x00`. Nous avons donc commencé par capturer les beacons des réseaux masqués. Puis, pour trouver leurs vrais SSIDs, nous avons sniffé le réseau jusqu'à capturer des Probe Responses envoyées par ces mêmes réseaux masqués contenant leurs SSIDs réels.
+
+Le script détecte tout d'abord les beacons envoyés par les réseaux cachés :
+
+![image-20220330093955315](figures/image-20220330093955315.png)
+
+Puis, lorsqu'il capture des Probe Responses, il affiche le SSID du réseau masqué et son BSSID associé :
+
+![image-20220330094127794](figures/image-20220330094127794.png)
+
+Dans un même temps, il met à jour le tableau avec le SSID révélé :
+
+![image-20220330094047473](figures/image-20220330094047473.png)
+
+Exemple d'utilisation :
+
+```bash
+sudo python3 reveal_hidden_ssid.py -s 10000
+```
+
+Ici l'option `-s` permet de renseigner une durée (en secondes) pendant lequel le script va sniffer le réseau.
 
 
 
