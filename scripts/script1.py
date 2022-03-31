@@ -15,12 +15,12 @@ target=False
 gateway=False
 
 while not target:
-    target_mac = input("Entrez l'adresse MAC de la cible")
+    target_mac = input("Entrez l'adresse MAC de la cible\n")
     target = re.search(regex, target_mac)
 
 while not gateway:
-    gateway_mac = input("Entrez l'adresse MAC de la gateway")
-    gateway = re.serach(regex, gateway_mac)
+    gateway_mac = input("Entrez l'adresse MAC de la gateway\n")
+    gateway = re.search(regex, gateway_mac)
 
 
 # Si le regex marche pas, décommenter le code en-dessous et commenter toute la partie Regex

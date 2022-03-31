@@ -12,6 +12,7 @@ def callback(packet):
     if packet.haslayer(Dot11Beacon):
         # extract the MAC address of the network
         if packet[Dot11].addr3 not in apAddr:
+            print(packet[Dot11].info.decode() + packet[Dot11].addr3)
             apAddr.append(packet[Dot11].addr3)
 
 def callback2(packet):
@@ -21,7 +22,7 @@ def callback2(packet):
 def main():
     iface = "wlan0"
 
-    sniff(prn=callback, iface=iface, timeout=5)
+    sniff(prn=callback, iface=iface, timeout=10)
     sniff(prn=callback2, iface=iface, timeout=10)
     print("APs disponibles : ")
     for a in apAddr:

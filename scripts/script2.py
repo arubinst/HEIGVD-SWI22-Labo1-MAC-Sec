@@ -63,10 +63,8 @@ if __name__ == "__main__":
     isScanning = False
     printer.join()
     channel_changer.join()
-
-    while network.empty:
-        netSSID = input("Entrez le nom du wifi à usurper, il doit correspondre à un wifi existant : ")  # Network name here
-        network = networks.loc[networks['SSID'] == netSSID]
+    netSSID = input("Entrez le nom du wifi à usurper, il doit correspondre à un wifi existant : ")  # Network name here
+    network = networks.loc[networks['SSID'] == netSSID]
 
     # positionnement 6 channels plus loin
     evilChannel = (network['Channel'] + 6) % 14
