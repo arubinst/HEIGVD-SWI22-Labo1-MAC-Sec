@@ -240,7 +240,7 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 
 **Execution du script:**
 
-![a](images/2022-03-30 21-43-59.png)
+![a](images/2022-03-30-21-43-59.png)
 
 ### 6. Hidden SSID reveal (exercices challenge optionnel - donne droit à un bonus)
 
