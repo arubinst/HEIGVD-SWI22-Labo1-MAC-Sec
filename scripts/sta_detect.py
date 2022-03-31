@@ -2,7 +2,7 @@
 import argparse
 
 from scapy.all import *
-from scapy.layers.dot11 import Dot11
+from scapy.layers.dot11 import Dot11ProbeReq, Dot11
 
 STAs = []
 
@@ -12,15 +12,13 @@ def packet_handler(p):
     Packet handler to analyse active Probe requests and discover new ssids
     :param p: the packet to analyse
     """
-    if p.haslayer(Dot11):
-        # Check for active Probe requests
-        if p.type == 0 and p.subtype == 4:
-            ssid = p.info.decode("utf-8")
-            sta = p.addr2
-            # Store the STAs looking for the target network
-            if ssid == args.SSID and sta not in STAs:
-                STAs.append(sta)
-                print(sta)
+    if p.haslayer(Dot11ProbeReq):
+        ssid = p.info.decode("utf-8")
+        sta = p.addr2
+        # Store the STAs looking for the target network
+        if ssid == args.SSID and sta not in STAs:
+            STAs.append(sta)
+            print(sta)
 
 
 def search_stas():
