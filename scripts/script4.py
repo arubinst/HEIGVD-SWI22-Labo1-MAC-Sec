@@ -10,7 +10,6 @@ SSID = input("Entrez le SSID recherché\n")
 def callback(packet):
     if packet.haslayer(Dot11ProbeReq):
         foundSSID = packet.info.decode()
-        print(foundSSID)
         if (foundSSID == SSID):
             dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',
                           addr2='22:22:22:22:22:22', addr3='33:33:33:33:33:33')
