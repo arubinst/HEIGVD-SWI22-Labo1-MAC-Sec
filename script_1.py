@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 """
+SWI laboratory - script n°1 - deauthentication script
+
 Author: Rébecca Tevaearai, Rosy-Laure Wonjamouna
 
 Created: 26th March, 2022
