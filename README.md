@@ -147,7 +147,7 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 * Générer un beacon concurrent annonçant un réseau sur un canal différent se trouvant à 6 canaux de séparation du réseau original
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
-
+**Réponse** : Ici on forge un point d'accès à partir d'un SSID déjà existant, cela fait que des utilisateurs vont potentiellement se connecter au faux point d'accès,  à l'instar du phishing, il est possible de récupérer des informations sensible, en deamndant à l'utilisateur de rentrer son mot de passe dans un formulaire par exemple
 
 ### 3. SSID flood attack
 
@@ -184,8 +184,10 @@ Développer un script en Python/Scapy capable de detecter une STA cherchant un S
 Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twin, vous pouvez très probablement réutiliser du code des exercices précédents ou vous servir d'un outil existant.
 
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
+**Réponse** : La STA cherche à se connecter à un un AP auquel il s'est déjà connecté auparavant, cependant l'adresse MAC et les clefs ont changées, il n'est donc pas possible de chiffrer le message.
 
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
+**Réponse** : Les dispositifs iOs et Android récents utilisent des adresses MAC randomisées sur le réseau.
 
 
 ### 5. Détection de clients et réseaux
