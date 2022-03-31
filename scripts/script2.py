@@ -1,3 +1,4 @@
+#Auteurs : Peguiron Adrien, Viotti Nicolas
 from scapy.all import *
 from threading import Thread
 import pandas
@@ -63,8 +64,10 @@ if __name__ == "__main__":
     printer.join()
     channel_changer.join()
 
-    netSSID = input("Entrez le nom du wifi à usurper, il doit correspondre à un wifi existant : ")  # Network name here
-    network = networks.loc[networks['SSID'] == netSSID]
+    while network.empty:
+        netSSID = input("Entrez le nom du wifi à usurper, il doit correspondre à un wifi existant : ")  # Network name here
+        network = networks.loc[networks['SSID'] == netSSID]
+        
     # positionnement 6 channels plus loin
     evilChannel = (network['Channel'] + 6) % 14
     os.system(f"iwconfig {iface} channel {evilChannel[0]}")
