@@ -215,7 +215,9 @@ Lancer dans script:
 sudo ./3_ssidFlood.py <file or count> <interface>
 ```
 
-Dans le 1er argument on peut soit donner un entier qui générera le nombre donné de SSID random, ou un fichier comprenant des SSID séparés par des retours à la ligne
+Dans le 1er argument on peut soit donner un entier qui générera le nombre donné de SSID random, ou un fichier comprenant des SSID séparés par des retours à la ligne. 
+
+À noter que le script semble ne fonctionner qu'en mode monitor
 
 Une fois le script lancé, ce dernier lance des trame Beacon pour les fake SSID:
 
@@ -229,7 +231,7 @@ Une fois le signal d'arrêt envoyé (Ctrl + C), le script arrête proprement les
 
 Preuve de fonctionnement: 
 
-
+![2022-03-31_23-44](images/2022-03-31_23-44.png)
 
 
 ## Partie 2 - probes
@@ -298,6 +300,10 @@ https://www.extremenetworks.com/extreme-networks-blog/wi-fi-mac-randomization-pr
 
 a) Développer un script en Python/Scapy capable de lister toutes les STA qui cherchent activement un SSID donné
 
+Le script est plutôt simple, il prend en argument le SSID à chercher et l'interface. Puis analyse chaque Probe request, et si le SSID est celui cherché, l'adresse de la STA est affichée
+
+![image-20220331234658072](images/image-20220331234658072.png)
+
 b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
 
 STAs &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; APs
@@ -307,6 +313,14 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 9C:F3:87:34:3C:CB &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 00:6B:F1:50:48:3A
 
 00:0E:35:C8:B8:66 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
+
+
+
+Après moultes problèmes nous avons pu faire un script qui fonctionne mais n'est pas parfait. Nous nous sommes basés sur la capture des paquets "QoS null" qui sont envoyés fréquemment depuis le client vers l'AP.
+
+Fonctionnement du script:
+
+![image-20220331234230783](images/image-20220331234230783.png)
 
 
 ### 6. Hidden SSID reveal (exercices challenge optionnel - donne droit à un bonus)
