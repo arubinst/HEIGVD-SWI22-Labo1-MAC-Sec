@@ -23,11 +23,6 @@ while not gateway:
     gateway = re.search(regex, gateway_mac)
 
 
-# Si le regex marche pas, décommenter le code en-dessous et commenter toute la partie Regex
-# target_mac = input("Entrez l'adresse MAC de la cible")
-# gateway_mac = input("Entrez l'adresse MAC de la gateway")
-
-
 # 802.11 frame
 # addr1: destination MAC
 # addr2: source MAC
