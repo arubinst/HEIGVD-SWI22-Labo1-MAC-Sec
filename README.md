@@ -90,8 +90,10 @@ Le corps de la trame (Frame body) contient, entre autres, un champ de deux octet
 a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
+> Code 7. Class 3 frame received from nonassociated station.
 
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
+> Nous n'avons trouvé que des trames avec le code 7.
 
 b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
 
@@ -101,14 +103,25 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 * 8 - Deauthenticated because sending STA is leaving BSS
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
+> 1 : comme la raison est inconnue elle peut être envoyer à la STA ou à l'AP.
+>
+> 4 : comme le client ne répond plus (timout), l'AP lui envoie la trame de déauthentification.
+>
+> 5 : car l'AP est occupé et ne peux pas s'occuper de toutes les STA, il va donc en déconnecter certaines.
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
+> 1 : comme la raison est inconnue elle peut être envoyer à la STA ou à l'AP.
+>
+> 8 : La STA a quitté le BSS/est parti sur un autre AP, elle envoie alors ce code à l'AP.
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
+> En mettant FF:FF:FF:FF:FF:FF comme adresse MAC pour la STA.
 
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
+> Pour le code 3 la station quitte (ou a quitté) un IBSS ou ESS, pour le code 8 la station quitte un BSS.
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+> Déconnexion totale de la cible, elle n'a plus accès à l'AP.
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
@@ -119,7 +132,7 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 * Générer un beacon concurrent annonçant un réseau sur un canal différent se trouvant à 6 canaux de séparation du réseau original
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
-
+> La cible pourrait se connecter à notre réseau piraté sur un autre canal sans s'en apercevoir.
 
 ### 3. SSID flood attack
 
@@ -156,9 +169,11 @@ Développer un script en Python/Scapy capable de detecter une STA cherchant un S
 Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twin, vous pouvez très probablement réutiliser du code des exercices précédents ou vous servir d'un outil existant.
 
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
+> Elles ne sont pas chiffrées, car elles ne contiennent pas d'informations utilisateur et qu'elles sont simplement utilisées pour la découverte réseau.
+> On pourrait chiffrer ces trames, mais cela peut réduire considérablement les performances de la méthode d'identification des appareils.
 
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
-
+> Car pour empêcher des tiers d'utiliser l'adresse MAC pour suivre les appareils, ils ont mis en oeuvre la randomisation de l'adresse MAC. C'est-à-dire que les probes requests sont envoyés avec des adresses fictives et non plus l'adresse réelle du dispositif.
 
 ### 5. Détection de clients et réseaux
 
@@ -180,7 +195,8 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 Développer un script en Python/Scapy capable de reveler le SSID correspondant à un réseau configuré comme étant "invisible".
 
 __Question__ : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
-
+> Tout d'abord il faut scanner les beacons pour voir si on en trouve où le SSID est vide (donc caché). On peut alors récupérer le BSSID associé.
+> Puis il faut scanner les probes requests envoyées par les appareils voulant se connecter à ce réseau, grace au BSSID précédemment trouvé, nous pouvons donc trouvé dans ces probes requests le SSID du réseau caché.
 
 
 ## Livrables
