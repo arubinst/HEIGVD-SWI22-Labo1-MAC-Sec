@@ -86,29 +86,85 @@ Le corps de la trame (Frame body) contient, entre autres, un champ de deux octet
 | 39 | Requested from peer QSTA due to timeout                                                                                                                                              |
 | 40 | Peer QSTA does not support the requested cipher suite                                                                                                                                              |
 | 46-65535 | Reserved                                                                                                                                              |
- 
-a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.
 
-__Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
+**a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.**
 
-__Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
+La commande que nous avons utilisée est la suivante :
 
-b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
+```
+ sudo aireplay-ng -0 10 -a dc:a5:f4:60:c2:b0 -c a8:0c:63:4c:43:fa ath0
+```
+
+- -0 Pour utiliser la deauthentication
+- 10 Nombre de deauth à envoyer
+- -a dc:a5:f4:60:c2:b0 est l'adresse MAC de l'AP
+- -c a8:0c:63:4c:43:fa est l'adresse MAC du client qu'on veut désauthentifier
+- ath0 is the interface name
+
+Source : [Deauthentication Aircrack-ng](https://www.aircrack-ng.org/doku.php?id=deauthentication)
+
+__Question__ : Quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
+
+![deauthCode](images/deauthCode.PNG)
+
+On peut voir sur l'image ci-dessus que le code utilisé est 7. Ce code est normalement utilisé lorsqu'un client a essayé d'envoyer des données en couche 3 (IP) à l'AP alors qu'il n'étais pas authentifié. L'AP lui envoie donc cette trame.
+
+__Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interprétation ?
+
+![deauthOther](images/deauthOther.PNG)
+
+Nous avons capturé cette trame qui cette fois a été envoyée à l'AP par une station. Cette fois le code est 1, la raison de la déauthentification n'a donc pas été spécifiée.
+
+![deauthOther1](images/deauthOther1.PNG)
+
+Plus tard, lors des tests de nos scripts, nous avons également aperçus le code 6, qui est envoyé pour les mêmes raisons que le code 7 mais cette fois le client a essayé d'envoyer des données en couche 2 (MAC).
+
+![deauthOther2](images/deauthOther2.PNG)
+
+Enfin nous avons également vu ce code, apparu souvent après ou pendant l'essai de nos scripts. Il s'agit du code 15 qui signifie que le processus du 4-way handshake n'a pas pu aboutir car un des paquets a mis trop de temps a arriver, il a donc timeout. L'AP envoie donc ce message pour que le client recommence le processus d'authentification puis le 4-way handshake.
+
+**b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :**
 
 * 1 - Unspecified
 * 4 - Disassociated due to inactivity
 * 5 - Disassociated because AP is unable to handle all currently associated stations
 * 8 - Deauthenticated because sending STA is leaving BSS
 
+Note : L'entièreté des scripts que nous avons développés sont conçus pour fonctionner sur un environnement Linux étant donné que nous utilisons des appels à des fonctions du système d'exploitation (iwconfig par exemple).
+
+Voici une image du script de désauthentification en fonctionnement. Une capture Wireshark a également été faite. On peut y voir les trames avec les 4 différents codes pouvant être utilisés avec le script ( [DeauthScript.pcapng](WiresharkCaptures/DeauthScript.pcapng) ).
+
+![deauthScript](images/deauthScript.PNG)
+
+Lien du script :  [deauthScript.py](Scripts/deauthScript.py) 
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
+
+Le code 4 car la dissociation due à l'inactivité signifie que le client a atteint la limite de temps pendant laquelle l'authentification restait valide sans nouveau message de la part du client. Cela permet d'éviter d'avoir une quantité infinie de sessions actives sur les AP si le client n'envoie pas de message de désauthentification lorsqu'il se déconnecte.
+
+Le code 5 également car il signifie que l'AP est surchargé et qu'il déconnecte des stations pour pouvoir s'en sortir.
+
+Enfin on pourrait également dire que le code 1 peut être envoyée par l'AP, ce code disant que la raison est non spécifiée, la trame pourrais tout a fait être émise par l'AP.
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
 
+Le code 8 car il signifie que le système d'exploitation a déplacé la connexion sur un autre access point et qu'il n'a donc plus besoin de l'association à l'ancien AP.
+
+Le code 1 peut également être utilisé par le client, comme vu plus haut. Plein de choses peuvent se passer sur le client, y compris des implémentations pas très correctes des normes ou des erreurs qui ne rentrent dans aucune catégorie ou encore pour effectuer des tests.
+
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
+
+On peut utiliser l'adresse MAC FF:FF:FF:FF:FF:FF qui envoie la trame en broadcast, ainsi toutes les stations seront déconnectées. Toutefois certaines cartes réseau/systèmes d'exploitations/configurations ignorent les désauthentifications envoyées en broadcast.
 
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
+Le code 3 est un code normalement envoyé par l'AP qui informe le client qu'il va être hors-ligne etqu'il déconnecte donc le client.
+
+Le code 8 est normalement envoyé par le client pour informer l'AP qu'il quitte l'association pour différentes raison, généralement pour changer d'AP.
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+
+La cible perd momentanément la connexion wifi, voir plus longtemps tant que l'attaque continue. A chaque fois qu'elle va essayer de se reconnecter un trame de désauthentification va arriver, forçant l'AP ou la cible a se déconnecter de nouveau et à recommencer la phase d'authentification. Le résultat est donc une impossibilité de se (re)connecter au wifi pour la cible.
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
@@ -118,13 +174,64 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 * Permettre à l'utilisateur de choisir le réseau à attaquer
 * Générer un beacon concurrent annonçant un réseau sur un canal différent se trouvant à 6 canaux de séparation du réseau original
 
+Script A APPELER  : [fakeChannelMain](Scripts/fakeChannelMain.py) 
+
+Lien script en tant que "librairie" : [fakeChannel](Scripts/fakeChannel.py) 
+
+Ne pas appeler en tant que tel (la lubrairie)
+
+Script en fonctionnement :
+
+![FakeChannel](images/FakeChannel.PNG)
+
+![FakeChannel1](images/FakeChannel1.PNG)
+
+Création de l'evil tween :
+
+![FakeChannel2](images/FakeChannel2.PNG)
+
+Capture des trames "evil tween" avec Wireshark :
+
+![FakeChannel3](images/FakeChannel3.PNG)
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+
+Cette attaque a pour effet de créer un faux AP qui propose un faux réseau extrêmement similaire à un réseau légitime. Le but est que la cible se connecte à notre faux réseau sans qu'elle s'en rende compte et que l'on puisse donc récupérer l'entièreté du trafic voir même modifier les paquets qui transitent par notre Evil Twin.
+
+Dans les fait c'est un peu plus compliqué dû au fait que la cible garde un profil des réseaux auxquels elle c'est déjà connectée et qu'en plus elle préfèrera toujours le réseau avec une sécurité plus élevée quand ils ont le même SSID. Cette attaque est donc plutôt efficace avec les wifi publics comme les aéroports, Mc Donalds, etc.
 
 
 ### 3. SSID flood attack
 
-Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.
+*Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.*
 
+**Réponse**
+
+Script A APPELER  : [SSIDFloodMain](Scripts/SSIDFloodMain.py) 
+
+Lien script en tant que "librairie" : [SSIDFlood](Scripts/SSIDFlood.py) 
+
+Ne pas appeler en tant que tel
+
+- Avec liste
+
+![3](./images/result/3.png)
+
+Apparition des réseaux sur l'ordinateur
+
+![3a-list](./images/result/3a-list.jpg)
+
+- Sans liste
+
+![3b1](./images/result/3b1.png)
+
+
+
+![3b2](./images/result/3b2.png)
+
+Apparition des réseaux sur l'ordinateur
+
+![3b-random](./images/result/3b-random.jpg)
 
 ## Partie 2 - probes
 
@@ -150,19 +257,35 @@ A des fins plus discutables du point de vue éthique, la détection de client s'
 ### 4. Probe Request Evil Twin Attack
 
 Nous allons nous intéresser dans cet exercice à la création d'un evil twin pour viser une cible que l'on découvre dynamiquement utilisant des probes.
- 
+
 Développer un script en Python/Scapy capable de detecter une STA cherchant un SSID particulier - proposer un evil twin si le SSID est trouvé (i.e. McDonalds, Starbucks, etc.).
 
 Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twin, vous pouvez très probablement réutiliser du code des exercices précédents ou vous servir d'un outil existant.
 
+**Réponse**
+
+Lien script : [evilTwin](Scripts/evilTwin.py) 
+
+![4](./images/result/4.png)
+
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 
+Il serait en effet plus judicieux de les chiffrer mais en faisant ça la station ne pourrait se connecter qu'à un seul AP et dans le cas d'un réseau de campus par exemple on ne pourrais pas se balader étant donné que la station ne pourra pas changer d'AP connecté car la trame de probe request étant chiffrée le nouvel AP ne saura pas que la station cherche son réseau.
+
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
+
+Car ils randomisent les adresses MAC qu'ils envoient dans leurs probe request. On ne peut donc plus suivre la cible puisqu'on ne peut plus l'identifier au milieu de toutes les autres adresses mac/probes request.
 
 
 ### 5. Détection de clients et réseaux
 
-a) Développer un script en Python/Scapy capable de lister toutes les STA qui cherchent activement un SSID donné
+*a) Développer un script en Python/Scapy capable de lister toutes les STA qui cherchent activement un SSID donné*
+
+**Réponse**
+
+Lien script : [5a](Scripts/5a.py) 
+
+![5a](./images/result/5a.png)
 
 b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
 
@@ -173,6 +296,12 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 9C:F3:87:34:3C:CB &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 00:6B:F1:50:48:3A
 
 00:0E:35:C8:B8:66 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
+
+**Réponse**
+
+Lien script : [5b](Scripts/5b.py) 
+
+![5b](./images/result/5b.png)
 
 
 ### 6. Hidden SSID reveal (exercices challenge optionnel - donne droit à un bonus)
