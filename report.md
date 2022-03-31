@@ -210,6 +210,11 @@ On confirme le résultat en faisant un airodump sur la même interface afin de v
 
 **Question** : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
 
+```
+Il faut d'abord récupérer les Beacons ayant un bssid pas encore membre de notre liste de "hidden ssid" et avec un ssid "vide". On ajoute par la suite le bssid de ce beacon à notre liste.
+On récupère également les Probes Responses correspondant aux bssid dans notre liste, cela nous permet de récupérer le SSID du réseau lorsque quelqu'un s'y connecte.
+```
+
 
 
 ------
@@ -220,4 +225,8 @@ Nous avons ajouté l'interface comme argument du script:
 
 ![](images/6_0.png)
 
+Voici le résultat après exécution de la commande :
+
 ![](images/7_2.png)
+
+On remarque que le SSID ne devient plus "hidden" une fois que quelqu'un s'y est connecté

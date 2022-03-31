@@ -12,6 +12,7 @@ list_ap_sta = []
 
 
 # Our function that links STA to an AP
+# for this function, we simply add the address of each different station that is linked to an AP
 def link(p):
     if p.type == 2:
         if p.addr1 != BROADCAST_ADDRESS and p.addr2 != BROADCAST_ADDRESS and p.addr3 is not None:
