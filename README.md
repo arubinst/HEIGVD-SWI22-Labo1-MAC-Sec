@@ -253,6 +253,11 @@ Développer un script en Python/Scapy capable de reveler le SSID correspondant �
 __Question__ : expliquer en quelques mots la solution que vous avez trouvée pour ce problème ?
  
 Nous avons commencé par établir la liste des AP cachées en sniffant le réseau et récupérant l’adresse MAC des APs ayant un SSID invisible. Ensuite, il faut attendre que quelqu'un se connecte en réseau pour observer la probe response dans lequel se trouvera le SSID.
+ 
+ **Execution du script + wireshark :**
+
+![](images/hiddenssid.png)
+
 
 ## Livrables
 
