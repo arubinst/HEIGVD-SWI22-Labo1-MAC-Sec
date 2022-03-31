@@ -1,16 +1,18 @@
+# Auteurs : Peguiron Adrien, Viotti Nicolas
+
 from scapy.all import *
 from threading import Thread
 import pandas
 import time
 import os
 
-iface = "wlan0"
+IFACE = "wlan0"
 SSID = input("Entrez le SSID recherché\n")
 
 def callback(packet):
     if packet.haslayer(Dot11ProbeReq):
         foundSSID = packet.info.decode()
-        if (foundSSID == SSID):
+        if (foundSSID == SSID): 
             dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',
                           addr2='22:22:22:22:22:22', addr3='33:33:33:33:33:33')
             beacon = Dot11Beacon(cap='ESS+privacy')
@@ -28,7 +30,7 @@ def callback(packet):
             frame = RadioTap() / dot11 / beacon / essid / rsn
 
             # envoie des trames
-            sendp(frame, iface=iface, inter=0.100, loop=1)
+            sendp(frame, iface=IFACE, inter=0.100, loop=1)
 
 if __name__ == "__main__":
 
