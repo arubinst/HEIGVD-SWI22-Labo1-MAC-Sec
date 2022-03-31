@@ -198,6 +198,8 @@ __Question__ : comment ça se fait que ces trames puissent être lues par tout l
 
 __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils plus être tracés avec cette méthode ?
 
+	Car les adresses MAC sont randomisées maintenant:
+	https://www.extremenetworks.com/extreme-networks-blog/wi-fi-mac-randomization-privacy-and-collateral-damage/
 
 ### 5. Détection de clients et réseaux
 
