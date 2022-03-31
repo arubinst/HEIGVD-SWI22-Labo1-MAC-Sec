@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-SWI laboratory - script n°4
+SWI laboratory - script n°4 - Probe request evil twin
 
 Author: Rébecca Tevaearai, Rosy-Laure Wonjamouna
 
