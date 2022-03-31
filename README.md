@@ -143,6 +143,10 @@ Le code 3 indique que la station a quitté un réseau de type ad-hoc ou ESS, alo
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
 Elle se fait déconnecter du réseau, mais les équipements réseau ont tendance à se reconnecter automatiquement rendant son effet temporaire. 
+ 
+ **Execution du script :**
+ 
+![](images/deauth1.png)
 
 ### 2. Fake channel evil tween attack
 
