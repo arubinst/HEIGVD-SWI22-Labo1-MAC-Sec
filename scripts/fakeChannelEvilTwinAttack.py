@@ -104,7 +104,7 @@ if __name__ == "__main__":
     print("Attack of SSID: ", attackSSIDName)
     attackSSIDChanel = networks.at[bsidToAttack, "Channel"]
     print("Was on Channel: ", attackSSIDChanel)
-    newChannel = (int(attackSSIDChanel) + 6) % 13 + 1
+    newChannel = (int(attackSSIDChanel) + 5) % 13 + 1
     print("Clone on Channel: ", newChannel)
     os.system(f"iwconfig {interface} channel {newChannel}")
 

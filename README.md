@@ -147,6 +147,24 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 * Permettre à l'utilisateur de choisir le réseau à attaquer
 * Générer un beacon concurrent annonçant un réseau sur un canal différent se trouvant à 6 canaux de séparation du réseau original
 
+Lancer la commande dans scripts:
+
+```bash
+sudo python3 fakeChannelEvilTwinAttack.py <interface>
+```
+
+Pendant les dix premières secondes, le temps d'itérer sur toutes les channels, le script scan les SSID et en fait une liste. A la fin de du scan, il est demandé à l'utilisateur d'entrer le BSSID à attaquer:
+
+![](images/fake01.png)
+
+Ensuite, un thread commence pour faire un evil à 6 channels d'écart:
+
+![](images/fake02.png)
+
+Finalement, le main vérifie toutes les dix secondes si le tween est sur la nouvelle channel (avec l'adresse MAC de l'utilisateur):
+
+![](images/fake03.png)
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 	
 
@@ -189,6 +207,26 @@ Nous allons nous intéresser dans cet exercice à la création d'un evil twin po
 Développer un script en Python/Scapy capable de detecter une STA cherchant un SSID particulier - proposer un evil twin si le SSID est trouvé (i.e. McDonalds, Starbucks, etc.).
 
 Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twin, vous pouvez très probablement réutiliser du code des exercices précédents ou vous servir d'un outil existant.
+
+Dans scripts, lancez:
+
+```bash
+sudo python3 probeRequestEvilTwinAttack.py <interface>
+```
+
+Le script vous salue avec votre adresse MAC. Et vous demande le SSID à trouver:
+
+![](images/probe01.png)
+
+Le script va itérer pendant 10 secondes sur toutes les channels pour trouver le SSID. Si le SSID n'est pas trouvé, le script scan le nouveau à nouveau pendant 10 secondes. L'opération est répétée tant que le SSID n'a pas été trouvé. Quand le SSID est trouvé, son adresse MAC est imprimée et il est demander à l'utilisateur sur quelle channel il veut faire le Twin de ce ssid.
+
+![](images/probe02.png)
+
+Pour vérifier que le clone fonctionne, il est vérifié que le SSID apparaisse sur la channel choisie avec l'adresse MAC de l'utilisateur:
+
+![](images/probe04.png)
+
+
 
 __Question__ : comment ça se fait que ces trames puissent être lues par tout le monde ? Ne serait-il pas plus judicieux de les chiffrer ?
 	

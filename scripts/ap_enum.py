@@ -12,7 +12,7 @@ aps = dict()
 
 def callback(packet):
     # Probe response = AP is present nearby. Add it to the list of APs
-    if packet.haslayer(Dot11ProbeRes): 
+    if packet.haslayer(Dot11ProbeResp):
         ssid = packet.info.decode('utf-8')
         mac = packet.addr2
         aps[mac] = ssid

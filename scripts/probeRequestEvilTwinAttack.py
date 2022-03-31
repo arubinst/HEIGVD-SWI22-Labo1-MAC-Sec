@@ -114,9 +114,9 @@ if __name__ == '__main__':
         print("SNIFFING FOR 10s to find: ", ssid_to_find)
         sniff(iface=interface, prn=handle_packet, timeout=10)  # start sniffin
         if len(mac) != 0:
-            print("SSID:", ssid_to_find, "founded with MAC:", mac[0])
+            print("SSID:", ssid_to_find, "found with MAC:", mac[0])
             break
-        print("Nothing founded, retry")
+        print("Nothing found, retry")
     endChange = 1
     channel_changer.join()
 
