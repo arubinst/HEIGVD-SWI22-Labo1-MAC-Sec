@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
+# Authors: Jean-Luc Blanc & Noémie Plancherel
 # import all the needed libraries
 import sys
 from subprocess import *
 from scapy.all import *
 import argparse
-
-# clear the console
-call(["clear"])                                           
 
 # define variables
 BROADCAST_ADDRESS = "ff:ff:ff:ff:ff:ff"
@@ -29,9 +27,8 @@ def link(p):
                 
 # our main function             
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser(description='PyRobe Help')
-    parser.add_argument('interface', action="store", help="specify interface (ex. mon0)", default=False)
+    parser = argparse.ArgumentParser(description='A python script for searching STA associated to AP')
+    parser.add_argument('interface', action="store", help="Specify a monitoring interface (ex. mon0)", default=False)
     args = parser.parse_args()
     print("\nSTA                               AP")
     sniff(iface=args.interface,prn=link, store=0)                    

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Authors: Jean-Luc Blanc & Noémie Plancherel
 from scapy.all import *
 import argparse
 
@@ -41,7 +42,7 @@ if __name__ == "__main__":
 
 	# managing arguments
     parser = argparse.ArgumentParser(description='A python script to generate a Probe Request Evil Twin attack')
-    parser.add_argument('interface', action="store", help="specify a monitoring interface (ex. mon0)", default=False)
+    parser.add_argument('interface', action="store", help="Specify a monitoring interface (ex. mon0)", default=False)
     parser.add_argument("ssid", action="store", help="Specify a ssid that you are looking for (ex. McDonald's)") 
     args = parser.parse_args()
     ssid_wanted = args.ssid

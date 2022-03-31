@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
+# Authors: Jean-Luc Blanc & Noémie Plancherel
 # import all the needed libraries
 import sys
 from subprocess import *
 from scapy.all import *
 import argparse
-import texttable as text_t
-
-# clear the console
-call(["clear"])                                           
+import texttable as text_t                                       
 
 # define variables
 hidden_ssid = dict()
@@ -24,9 +22,8 @@ def find(p):
 
 # our main function             
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser(description='PyRobe Help')
-    parser.add_argument('interface', action="store", help="specify interface (ex. mon0)", default=False)
+    parser = argparse.ArgumentParser(description='A python script to find hidden ssid')
+    parser.add_argument('interface', action="store", help="Specify a monitoring interface (ex. mon0)", default=False)
     args = parser.parse_args()
     sniff(iface=args.interface,prn=find, store=0)
     print(hidden_ssid)                 

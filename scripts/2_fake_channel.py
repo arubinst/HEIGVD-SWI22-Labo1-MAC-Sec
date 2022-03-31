@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Authors: Jean-Luc Blanc & Noémie Plancherel
 from scapy.all import *
 import argparse 
 from threading import Thread
