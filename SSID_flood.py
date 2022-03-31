@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
 """
-Author: Rébecca Tevaearai, 
+SWI laboratory - script n°3 - SSID flood
+
+Author: Rébecca Tevaearai, Rosy-Laure Wonjamouna
 
 Created: 26th March, 2022
 
-Développer un script en Python/Scapy capable d'inonder la
-salle avec des SSID dont le nom correspond à une liste
-contenue dans un fichier text fournit par un utilisateur.
-Si l'utilisateur ne possède pas une liste, il peut
-spécifier le nombre d'AP à générer. Dans ce cas, les SSID
-seront générés de manière aléatoire.
+1. Développer un script en Python/Scapy capable d'inonder la
+   salle avec des SSID dont le nom correspond à une liste
+   contenue dans un fichier text fournit par un utilisateur.
+2. Si l'utilisateur ne possède pas une liste, il peut
+   spécifier le nombre d'AP à générer. Dans ce cas, les SSID
+   seront générés de manière aléatoire.
 
 """
 
