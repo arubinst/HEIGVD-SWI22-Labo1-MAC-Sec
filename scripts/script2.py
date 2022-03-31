@@ -90,4 +90,4 @@ if __name__ == "__main__":
     frame = RadioTap() / dot11 / beacon / essid / rsn
 
 # Envoi des trames
-    sendp(frame, IFACE=IFACE, inter=0.100, loop=1)
+    sendp(frame, iface=IFACE, inter=0.100, loop=1)
