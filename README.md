@@ -111,6 +111,14 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 * 8 - Deauthenticated because sending STA is leaving BSS
 
 > Le script est disponible dans `scripts/script1.py`
+>
+> ![1](images/script1_cmd.png)
+>
+> Une fois le script lancé, on demande la raison. Après avoir entré la raison, il faut encore entrer l'adresse MAC de la cible et celle du point d'accès. Ensuite, 100 paquets de déauth sont envoyés.
+>
+> ![1](images/script1_ws.png)
+>
+> En regardant l'exemple précédant dans Wireshark, on peut vérifier que le code 4 est bien envoyé depuis l'AP jusqu'à la STA.
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
@@ -156,6 +164,14 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 * Générer un beacon concurrent annonçant un réseau sur un canal différent se trouvant à 6 canaux de séparation du réseau original
 
 > Le script est disponible dans `scripts/script2.py`
+>
+> ![1](images/script2_cmd.png)
+>
+> Tout d'abord, le nom des différents APs ainsi que leur signal, channel et adresse MAC sont affichés. Ensuite, un SSID à usurper est demandé. Une fois celui-ci renseigné, des trames de beacon sont envoyées.
+>
+> ![1](images/script2_ws.png)
+>
+> Sur cette capture, on peut voir les fausses adresses source et cible. Le SSID correspond bien à celui entré lors de l'exécution du script.
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
@@ -169,6 +185,20 @@ __Question__ : Expliquer l'effet de cette attaque sur la cible
 Développer un script en Python/Scapy capable d'inonder la salle avec des SSID dont le nom correspond à une liste contenue dans un fichier text fournit par un utilisateur. Si l'utilisateur ne possède pas une liste, il peut spécifier le nombre d'AP à générer. Dans ce cas, les SSID seront générés de manière aléatoire.
 
 > Le script est disponible dans `scripts/script3.py`
+>
+> ![1](images/script3_cmd.png)
+>
+> Une fois le nom du fichier contenant les SSIDS entré, les paquets sont envoyés. Dans cette exemple, les SSIDs sont "test1" "test2" "test3"
+>
+> ![1](images/script3_ws.png)
+>
+> Si aucun nom n'est renseigné, il faut alors entrer un nombre de SSID a créer. Ils seront générés aléatoirement avec comme nom des valeurs entre 0 et 1.
+>
+> ![1](images/script3_cmd2.png)
+>
+> 
+>
+> ![1](images/script3_ws2.png)
 
 
 ## Partie 2 - probes
@@ -199,6 +229,12 @@ Nous allons nous intéresser dans cet exercice à la création d'un evil twin po
 Développer un script en Python/Scapy capable de detecter une STA cherchant un SSID particulier - proposer un evil twin si le SSID est trouvé (i.e. McDonalds, Starbucks, etc.).
 
 > Le script est disponible dans `scripts/script4.py`
+>
+> Il suffit d'entrer le nom du SSID et, dès qu'une STA le recherche, un evil twin sera créé avec ce nom.
+>
+> ![1](images/script4_cmd.png)
+>
+> ![1](images/script4_ws.png)
 
 Pour la détection du SSID, vous devez utiliser Scapy. Pour proposer un evil twin, vous pouvez très probablement réutiliser du code des exercices précédents ou vous servir d'un outil existant.
 
@@ -214,6 +250,14 @@ __Question__ : pourquoi les dispositifs iOS et Android récents ne peuvent-ils p
 a) Développer un script en Python/Scapy capable de lister toutes les STA qui cherchent activement un SSID donné
 
 > Le script est disponible dans `scripts/script5.py`
+>
+> En entrant le nom du SSID recherché, les STA le cherchant sont alors affichées
+>
+> ![1](images/script5_cmd.png)
+>
+> On voit ici une trame d'une des deux STAs cherchant le wifi HEIG-VD
+>
+> ![1](images/script5_ws.png)
 
 b) Développer un script en Python/Scapy capable de générer une liste d'AP visibles dans la salle et de STA détectés et déterminer quelle STA est associée à quel AP. Par exemple :
 
@@ -226,6 +270,10 @@ B8:17:C2:EB:8F:8F &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 00:0E:35:C8:B8:66 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 08:EC:F5:28:1A:EF
 
 > Le script est disponible dans `scripts/script6.py`
+>
+> ![1](images/script6.png)
+>
+> Ici, les APs disponibles sont d'abord affichées, ensuite les STAs et finalement les connections entre une STA et une AP
 
 
 ### 6. Hidden SSID reveal (exercices challenge optionnel - donne droit à un bonus)
