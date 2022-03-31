@@ -119,13 +119,25 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
+>   https://support.zyxel.eu/hc/en-us/articles/360009469759-What-is-the-meaning-of-802-11-Deauthentication-Reason-Codes-
+
+Disassociated due to inactivity 
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
+
+>   
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
+>   En indiquant l'adresse de broadcast comme cible de l'attaque
+
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
+>   
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+
+>    L'attaque force la cible à se désauthentifier de l'AP, et va immédiatement recommencer le 4-way handshake, qui lorsqu'il est capturé, peut être utilisé dans d'autres attaques. 
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
