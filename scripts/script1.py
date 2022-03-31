@@ -1,12 +1,33 @@
+#Auteurs : Peguiron Adrien, Viotti Nicolas
+from doctest import FAIL_FAST
 from scapy.all import *
 import sys
+import re
 
 reason = 0
 while reason != 1 and reason != 4 and reason != 5 and reason != 8 :
     reason = int(input("Veuillez enter une raison entre 1, 4, 5 et 8\n"))
 # grandement inspiré de https://www.thepythoncode.com/article/force-a-device-to-disconnect-scapy
-target_mac = "a4:50:46:d6:31:98"
-gateway_mac = "58:90:43:8F:7E:24"
+
+#Regex pour vérifier l'adresse MAC entrée
+regex = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}\\.[0-9a-fA-F]{4}\\.[0-9a-fA-F]{4})$"
+target=False
+gateway=False
+
+while not target:
+    target_mac = input("Entrez l'adresse MAC de la cible")
+    target = re.search(regex, target_mac)
+
+while not gateway:
+    gateway_mac = input("Entrez l'adresse MAC de la gateway")
+    gateway = re.serach(regex, gateway_mac)
+
+
+# Si le regex marche pas, décommenter le code en-dessous et commenter toute la partie Regex
+# target_mac = input("Entrez l'adresse MAC de la cible")
+# gateway_mac = input("Entrez l'adresse MAC de la gateway")
+
+
 # 802.11 frame
 # addr1: destination MAC
 # addr2: source MAC
