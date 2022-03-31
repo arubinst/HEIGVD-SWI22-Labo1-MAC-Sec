@@ -14,25 +14,23 @@ def packet_handler(p):
     Display each new AP with the BSSID, signal strength, channel and SSID
     :param p: the packet to analyse
     """
-    if p.haslayer(Dot11):
-        # Check for Beacon frame
-        if p.type == 0 and p.subtype == 8:
-            # Get mac address of the AP
-            bssid = p.addr2
-            if bssid not in BSSIDs:
-                # Try to get the signal
-                try:
-                    signal = p.dBm_antSignal
-                except:
-                    signal = "N/A"
+    if p.haslayer(Dot11Beacon):
+        # Get mac address of the AP
+        bssid = p.addr2
+        if bssid not in BSSIDs:
+            # Try to get the signal
+            try:
+                signal = p.dBm_antSignal
+            except:
+                signal = "N/A"
 
-                channel = p[Dot11Beacon].network_stats().get("channel")
+            channel = p[Dot11Beacon].network_stats().get("channel")
 
-                ssid = p.info.decode("utf-8")
+            ssid = p.info.decode("utf-8")
 
-                # Store and display the new BSSID
-                BSSIDs[bssid] = (signal, channel, ssid)
-                print(bssid, signal, channel, ssid)
+            # Store and display the new BSSID
+            BSSIDs[bssid] = (signal, channel, ssid)
+            print("{} {:^17} {:^9} {}".format(bssid, signal, channel, ssid))
 
 
 def search_ap():
@@ -40,7 +38,7 @@ def search_ap():
     Sniff for Ap's in the proximity
     :return:
     """
-    print("<MAC> <signal strength> <channel> <SSID>")
+    print("{:<16} {} {:<2} {:<32}".format("<MAC>", "<signal strength>","<channel>","<SSID>"))
     sniff(iface=args.Interface, prn=packet_handler, timeout=args.Timeout)
 
 
@@ -62,8 +60,7 @@ def forge_packet(bssid):
     """
     _, channel, ssid = BSSIDs[bssid]
 
-    # jump of five on used channels (1, 6, 11)
-    channel = (channel + 5) % 15
+    channel = channel + 6 if channel <= 6 else channel - 6
 
     # forge beacon packet
     packet = RadioTap() \
@@ -98,7 +95,7 @@ parser.add_argument("-i", "--Interface", required=True,
                     help="The interface that you want to use, needs to be set to monitor mode")
 
 parser.add_argument("-b", "--BSSID", required=True,
-                    help="The BSSID of the evil AP for the new network",)
+                    help="The BSSID of the evil AP for the new network", )
 
 parser.add_argument("-t", "--Timeout", required=False, help="The time in seconds to wait before stopping the sniffing",
                     default=5)

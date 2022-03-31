@@ -44,9 +44,9 @@ parser.add_argument("-c", "--Client", required=True,
                     help="The MAC address of the STA you want to deauth from the AP. For broadcast use FF:FF:FF:FF:FF:FF ")
 
 parser.add_argument("-r", "--Reason", required=False, help="The reason value of the deauth (1/4/5/8)",
-                    choices=["1", "4", "5", "8"], default=1)
+                    choices=["1", "4", "5", "8"], default="1")
 parser.add_argument("-n", "--Packets", required=False, help="The number of packets to send", default=10)
 
 args = parser.parse_args()
 
-deauth(args.Interface, args.BSSID, args.Client, args.Reason, args.Packets)
+deauth(args.Interface, args.BSSID, args.Client, args.Reason, int(args.Packets))
