@@ -61,5 +61,3 @@ if __name__ == "__main__":
     sniffer.join()
     channel_changer.join()
 
-    
-    main(args)
