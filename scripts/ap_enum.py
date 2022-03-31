@@ -7,15 +7,30 @@ from time import sleep
 import os
 
 hashs = set()
+aps = dict()
+
 
 def callback(packet):
-    if packet.haslayer(Dot11ProbeReq):
-            ssid = packet.info.decode('utf-8')
-            sta = packet.addr2
-            h = ssid + sta
-            if h not in hashs:
+    # Probe response = AP is present nearby. Add it to the list of APs
+    if packet.haslayer(Dot11ProbeRes): 
+        ssid = packet.info.decode('utf-8')
+        mac = packet.addr2
+        aps[mac] = ssid
+
+    # Auth = STA is connected/connecting to the AP with the given MAC
+    if packet.haslayer(Dot11Auth):
+        sta_mac = packet.addr2
+        ap_mac = packet.addr1
+
+        if ap_mac in aps: # if we know the ssid of ap_mac
+            ssid = aps[packet]
+            h = ssid + sta_mac
+
+            if h not in hashs: # print only once
                 hashs.add(h)
-                print(f"{packet.addr2}    {ssid.ljust(25)}    {packet.dBm_AntSignal}")
+                print(f"{sta_mac}    {ssid.ljust(25)}    {packet.ap_mac}")
+
+
             
 def change_channel():
     ch = 1
@@ -26,7 +41,7 @@ def change_channel():
     print("Stopped changing channel")
 
 def sniff_sta():
-    sniff(prn=callback, iface=interface, stop_filter=lambda _:stop_signal)    
+    sniff(prn=callback, iface=interface, stop_filter=lambda _:stop_signal)
     print("Stopped sniffing")
 
 if __name__ == "__main__":
@@ -44,19 +59,20 @@ if __name__ == "__main__":
     args = parser.parse_args()
     interface = args.interface
 
-    stop_signal = False    
+    stop_signal = False
         
     channel_changer = Thread(target=change_channel)
     channel_changer.daemon = True
     channel_changer.start()
     
+    # Start sniffing
     print("Press any key to stop the script")
-    print("MAC                  SSID                         dm_Signal")
+    print("MAC                  SSID                         AP MAC")
     sniffer = Thread(target=sniff_sta)
     sniffer.daemon = True
     sniffer.start()
     
-    
+    # Wait for the user input to stop the threads
     input()
     
     print("Stopping...")
