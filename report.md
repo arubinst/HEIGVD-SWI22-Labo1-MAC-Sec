@@ -160,7 +160,13 @@ Voici les arguments obligatoires:
 Il faut d'abord écrire la commande `sudo ./script.py wlan0 "HEIG-VD"` où `HEIG-VD` indique le SSID que l'ont cherche.
 Voici le résultat : 
 
-![](images/4_2.PNG)
+![](images/7_0.png)
+
+On peut constater que l'attaque a fonctionné en regardant les trames Wireshark:
+
+![](images/7_1.png)
+
+Nous pouvons voir ci-dessus, que le MAC `40:ec:99:21:b7:c7` envoie beaucoup de paquets beacon avec le ssid `HEIG-VD`.
 
 ## Détection de clients et réseaux
 
